@@ -4,6 +4,13 @@ from tools import *
 
 
 def main():
+    # hyper-param
+    frac = None
+    do_ac = True
+    do_psd = True
+    do_av = True
+    do_savefig = True
+
     # ===========================================
     # =========== PART A ========================
     # ===========================================
@@ -31,7 +38,7 @@ def main():
     axs[0].title.set_text('White noises')
 
     # B. 3 RW realization with different color and legends
-    axs[1].plot(RW.T, linewidth=0.01)
+    axs[1].plot(RW.T, linewidth=lw)
     axs[1].title.set_text('Random walks')
 
     # C. 3 GM (T=2000) realization with different color and legends
@@ -45,8 +52,9 @@ def main():
     axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
 
     fig.suptitle('Types of noises', fontsize=16.0)
-    fig.savefig('Fig_1.svg', format='svg')
-    fig.savefig('Fig_1.png', format='png')
+    if do_savefig:
+        fig.savefig('Fig_1.svg', format='svg')
+        fig.savefig('Fig_1.png', format='png')
 
     # saving results in .txt file
     np.savetxt('WN.txt', WN.T, delimiter=';', fmt='%.8f')
@@ -59,46 +67,44 @@ def main():
     # ===========================================
     # 4. Noise characteristics for each sequence
     # 4.a AutoCorrelation
-    do_ac = False
     if do_ac == True:
         fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
         fig.suptitle('AutoCorrelation')
         # A. AC of 3 WN realization with different color and legends
         for i in range(n_series):
-            AC_WN = AC(WN[i, :])
+            AC_WN = AC(WN[i, :frac])
             AC_WN = (AC_WN - np.min(AC_WN)) / (np.max(AC_WN) - np.min(AC_WN))
             axs[0].plot(AC_WN)
         axs[0].set_title(f"White Noise")
 
         # B. AC of 3 RW realization with different color and legends
         for i in range(n_series):
-            AC_RW = AC(RW[i, :])
+            AC_RW = AC(RW[i, :frac])
             AC_RW = (AC_RW - np.min(AC_RW)) / (np.max(AC_RW) - np.min(AC_RW))
             axs[1].plot(AC_RW)
         axs[1].set_title(f"Random Walk")
 
         # C. AC of 3 GM (T=2000) realization with different color and legends
         for i in range(n_series):
-            AC_GM_2000 = AC(GM_2000[i, :])
+            AC_GM_2000 = AC(GM_2000[i, :frac])
             AC_GM_2000 = (AC_GM_2000 - np.min(AC_GM_2000)) / (np.max(AC_GM_2000) - np.min(AC_GM_2000))
             axs[2].plot(AC_GM_2000)
         axs[2].set_title(f"Gauss Markov - tau=2000")
 
         # D. AC of 3 GM (T=500) realization with different color and legends
         for i in range(n_series):
-            AC_GM_500 = AC(GM_500[i, :])
+            AC_GM_500 = AC(GM_500[i, :frac])
             AC_GM_500 = (AC_GM_500 - np.min(AC_GM_500)) / (np.max(AC_GM_500) - np.min(AC_GM_500))
             axs[3].plot(AC_GM_500)
         axs[3].set_title(f"Gauss Markov - tau=500")
         legend = ['Real 1', 'Real 2', 'Real 3']
         axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
 
-        fig.savefig('AC.svg', format='svg')
-        fig.savefig('AC.png', format='png')
+        if do_savefig:
+            fig.savefig('AC.svg', format='svg')
+            fig.savefig('AC.png', format='png')
 
     # 4.b Power-Spectral_Density
-    frac = None
-    do_psd = True
     if do_psd == True:
             fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
             fig.suptitle('Power Spectral Density')
@@ -128,12 +134,11 @@ def main():
             legend = ['Real 1', 'Real 2', 'Real 3']
             axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
 
-            fig.savefig('PSD.svg', format='svg')
-            fig.savefig('PSD.png', format='png')
+            if do_savefig:
+                fig.savefig('PSD.svg', format='svg')
+                fig.savefig('PSD.png', format='png')
 
     # 4.c Allan Variance
-    frac = None
-    do_av = True
     if do_av == True:
         fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
         fig.suptitle('Allan Variance')
@@ -156,11 +161,14 @@ def main():
         tau, av = AVar(GM_500[0, :])
         axs[3].loglog(tau, av)
         axs[3].set_title(f"Gauss Markov - tau=500")
-
-        fig.savefig('AVar.svg', format='svg')
-        fig.savefig('AVar.png', format='png')
+        if do_savefig:
+            fig.savefig('AVar.svg', format='svg')
+            fig.savefig('AVar.png', format='png')
 
     plt.show()
+
+    # 6.
+
 
 if __name__ == '__main__':
     main()
