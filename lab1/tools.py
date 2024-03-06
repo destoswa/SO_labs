@@ -1,23 +1,20 @@
 import numpy as np
 from scipy import signal
-import matplotlib.pyplot as plt
-import allantools
-
+from allan_variance import allan_variance, params_from_avar
 
 def white_noise(n_series, length, mean=0, std=1):
     return mean + std * np.random.randn(n_series, length)
 
 
-def random_walk(n_series, length, mean=0, std=1):
-    WN = white_noise(n_series, length, mean=mean, std=std)
+def random_walk(WN):
     return np.cumsum(WN, axis=0)
 
 
-def gauss_markov(n_series, length, tau, mean=0, std=1, dt=1):
-    WN = white_noise(n_series, length, mean=mean, std=std)
+def gauss_markov(WN, tau, dt=1):
     length = WN.shape[1]
     beta = 1/tau
     GM = np.zeros_like(WN)  #   Assume GM[0] = 0
+    #GM = WN.copy()
     for i in range(1, length):
         GM[:, i] = GM[:, i-1] * np.exp(-beta*dt) + WN[:, i-1]
     return GM
@@ -28,14 +25,11 @@ def AC(X):
 
 
 def PSD(X, dt=1):
-    return signal.periodogram(X, dt, scaling='density', return_onesided=False)
-    """(S, f) = plt.psd(X, Fs=dt, sides='twosided')
-    return f, S"""
+    return signal.welch(X, fs=dt, return_onesided=False, scaling='spectrum')
 
 
-def AVar(X):
-    a = allantools.Dataset(data=X)
-    a.compute("mdev")
-    return a
+def AVar(X, dt=1):
+    tau, av = allan_variance(X, dt, input_type='increment')
+    return tau, av
 
 
