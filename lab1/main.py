@@ -2,9 +2,7 @@ import matplotlib.pyplot as plt
 from tools import *
 
 
-
 def main():
-
 	# paths
 	REALIZATION_FOLDER = "./data/realizations/"
 	IMAGES_FOLDER = "./data/images/"
@@ -33,25 +31,37 @@ def main():
 	gm_500 = gauss_markov(wn, tau=500, dt=1)
 
 	# Figure 1
-	fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
+	fig = plt.figure(constrained_layout=True, figsize=(10, 10))
+	subfigs = fig.subfigures(4, 1, hspace=0.1)
+	axs = []
+	for i, subfig in enumerate(subfigs):
+		axs.append(subfigs[i].subplots(1, 1))
+	legend = ['Real 1', 'Real 2', 'Real 3']
 
 	# A. 3 WN realization with different color and legends
 	axs[0].plot(wn.T, linewidth=0.01)
 	axs[0].title.set_text('White noises')
+	leg_0 = axs[0].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
+
+	# A bis. Correct legend linewidth
+	lines_0 = leg_0.get_lines()
+	for line in lines_0:
+		line.set_linewidth(2)
 
 	# B. 3 RW realization with different color and legends
 	axs[1].plot(rw.T)
 	axs[1].title.set_text('Random walks')
+	axs[1].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 	# C. 3 GM (T=2000) realization with different color and legends
 	axs[2].plot(gm_2000.T)
 	axs[2].title.set_text('1st order Gauss-Markov process, tau = 2000')
+	axs[2].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 	# D. 3 GM (T=500) realization with different color and legends
 	axs[3].plot(gm_500.T)
 	axs[3].title.set_text('1st order Gauss-Markov process, tau = 500')
-	legend = ['Real 1', 'Real 2', 'Real 3']
-	axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
+	axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 	fig.suptitle('Types of noises', fontsize=16.0)
 	if do_savefig:
@@ -70,14 +80,21 @@ def main():
 	# 4. Noise characteristics for each sequence
 	# 4.a AutoCorrelation
 	if do_ac:
-		fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
+		fig = plt.figure(constrained_layout=True, figsize=(10, 10))
+		subfigs = fig.subfigures(4, 1, hspace=0.1)
+		axs = []
+		for i, subfig in enumerate(subfigs):
+			axs.append(subfigs[i].subplots(1, 1))
+		legend = ['Real 1', 'Real 2', 'Real 3']
 		fig.suptitle('AutoCorrelation')
+
 		# A. AC of 3 WN realization with different color and legends
 		for i in range(n_series):
 			ac_wn = autocorr(wn[i, :frac])
 			ac_wn = (ac_wn - np.min(ac_wn)) / (np.max(ac_wn) - np.min(ac_wn))
 			axs[0].plot(ac_wn)
 		axs[0].set_title(f"White Noise")
+		axs[0].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		# B. AC of 3 RW realization with different color and legends
 		for i in range(n_series):
@@ -85,6 +102,7 @@ def main():
 			ac_rw = (ac_rw - np.min(ac_rw)) / (np.max(ac_rw) - np.min(ac_rw))
 			axs[1].plot(ac_rw)
 		axs[1].set_title(f"Random Walk")
+		axs[1].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		# C. AC of 3 GM (T=2000) realization with different color and legends
 		for i in range(n_series):
@@ -92,6 +110,7 @@ def main():
 			ac_gm_2000 = (ac_gm_2000 - np.min(ac_gm_2000)) / (np.max(ac_gm_2000) - np.min(ac_gm_2000))
 			axs[2].plot(ac_gm_2000)
 		axs[2].set_title(f"Gauss Markov - tau=2000")
+		axs[2].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		# D. AC of 3 GM (T=500) realization with different color and legends
 		for i in range(n_series):
@@ -99,8 +118,7 @@ def main():
 			ac_gm_500 = (ac_gm_500 - np.min(ac_gm_500)) / (np.max(ac_gm_500) - np.min(ac_gm_500))
 			axs[3].plot(ac_gm_500)
 		axs[3].set_title(f"Gauss Markov - tau=500")
-		legend = ['Real 1', 'Real 2', 'Real 3']
-		axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
+		axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		if do_savefig:
 			fig.savefig(IMAGES_FOLDER + 'AC.svg', format='svg')
@@ -108,25 +126,34 @@ def main():
 
 	# 4.b Power-Spectral_Density
 	if do_psd:
-		fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
+		fig = plt.figure(constrained_layout=True, figsize=(10, 10))
+		subfigs = fig.subfigures(4, 1, hspace=0.1)
+		axs = []
+		for i, subfig in enumerate(subfigs):
+			axs.append(subfigs[i].subplots(1, 1))
+		legend = ['Real 1', 'Real 2', 'Real 3']
 		fig.suptitle('Power Spectral Density')
+
 		# A. AC of 3 WN realization with different color and legends
 		for i in range(n_series):
 			(f1, S1) = psd(wn[i, :frac])
 			axs[0].plot(f1, S1)
 		axs[0].set_title(f"White Noise")
+		axs[0].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		# B. AC of 3 RW realization with different color and legends
 		for i in range(n_series):
 			(f2, S2) = psd(rw[i, :frac])
 			axs[1].plot(f2, S2)
 		axs[1].set_title(f"Random Walk")
+		axs[1].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		# C. AC of 3 GM (T=2000) realization with different color and legends
 		for i in range(n_series):
 			(f3, S3) = psd(gm_2000[i, :frac])
 			axs[2].plot(f3, S3)
 		axs[2].set_title(f"Gauss Markov - tau=2000")
+		axs[2].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		# D. AC of 3 GM (T=500) realization with different color and legends
 		for i in range(n_series):
@@ -134,7 +161,7 @@ def main():
 			axs[3].plot(f4, S4)
 		axs[3].set_title(f"Gauss Markov - tau=500")
 		legend = ['Real 1', 'Real 2', 'Real 3']
-		axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
+		axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 		if do_savefig:
 			fig.savefig(IMAGES_FOLDER + 'PSD.svg', format='svg')
@@ -142,27 +169,38 @@ def main():
 
 	# 4.c Allan Variance
 	if do_av:
-		fig, axs = plt.subplots(4, 1, constrained_layout=True, figsize=(10, 10))
+		fig = plt.figure(constrained_layout=True, figsize=(10, 10))
+		subfigs = fig.subfigures(4, 1, hspace=0.1)
+		axs = []
+		for i, subfig in enumerate(subfigs):
+			axs.append(subfigs[i].subplots(1, 1))
+		legend = ['Real 1']
 		fig.suptitle('Allan Variance')
+
 		# A. AC of 3 WN realization with different color and legends
 		tau, av = allan_var(wn[0, :])
 		axs[0].loglog(tau, av)
 		axs[0].set_title(f"White Noise")
+		axs[0].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25))
 
 		# B. AC of 3 RW realization with different color and legends
 		tau, av = allan_var(rw[0, :])
 		axs[1].loglog(tau, av)
 		axs[1].set_title(f"Random Walk")
+		axs[1].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25))
 
 		# C. AC of 3 GM (T=2000) realization with different color and legends
 		tau, av = allan_var(gm_2000[0, :])
 		axs[2].loglog(tau, av)
 		axs[2].set_title(f"Gauss Markov - tau=2000")
+		axs[2].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25))
 
 		# D. AC of 3 GM (T=500) realization with different color and legends
 		tau, av = allan_var(gm_500[0, :])
 		axs[3].loglog(tau, av)
 		axs[3].set_title(f"Gauss Markov - tau=500")
+		axs[3].legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25))
+
 		if do_savefig:
 			fig.savefig(IMAGES_FOLDER + 'AVar.svg', format='svg')
 			fig.savefig(IMAGES_FOLDER + 'AVar.png', format='png')
