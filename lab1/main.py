@@ -26,7 +26,7 @@ def main():
 
 	# A. 3 WN realization with different color and legends
 	wn = white_noise(n_series=n_series, length=length, std=wn_std, random_seed=random_seed)
-	plot_1(ax=axs[0], serie=wn, title='White noises', legend=LEGEND, linewidth=0.01)
+	plot_1(ax=axs[0], serie=wn, title='White noises', legend=LEGEND, linewidth=0.1)
 
 	# B. 3 RW realization with different color and legends
 	rw = random_walk(wn)
