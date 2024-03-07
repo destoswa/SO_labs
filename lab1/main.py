@@ -97,7 +97,7 @@ def main():
 	# 4.c Allan Variance
 	if do_av:
 		fig, axs = create_subfigs(title='Allan Variance', shape=(4, 1))
-		legend = 'Real 1'
+		legend = ['Real 1']
 
 		# A. AC of 3 WN realization with different color and legends
 		tau, av = allan_var(wn[0])
