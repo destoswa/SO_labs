@@ -11,7 +11,8 @@ def white_noise(n_series, length, mean=0, std=1, random_seed=42):
 
 
 def random_walk(wn):
-	return np.cumsum(wn, axis=1)
+	rw = np.cumsum(wn, axis=1)
+	return rw
 
 
 def gauss_markov(wn, tau, dt=1):
@@ -38,7 +39,7 @@ def allan_var(x, dt=1):
 	return tau, av
 
 
-# Plots functions
+# plot functions
 
 def create_subfigs(title, shape):
 	fig = plt.figure(constrained_layout=True, figsize=(10, 10))
