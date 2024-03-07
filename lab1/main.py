@@ -97,22 +97,23 @@ def main():
 	# 4.c Allan Variance
 	if do_av:
 		fig, axs = create_subfigs(title='Allan Variance', shape=(4, 1))
+		legend = 'Real 1'
 
 		# A. AC of 3 WN realization with different color and legends
 		tau, av = allan_var(wn[0])
-		plot_loglog_av(ax=axs[0], tau=tau, av=av, title='White Noise', legend=LEGEND[0])
+		plot_loglog_av(ax=axs[0], tau=tau, av=av, title='White Noise', legend=legend)
 
 		# B. AC of 3 RW realization with different color and legends
 		tau, av = allan_var(rw[0])
-		plot_loglog_av(ax=axs[1], tau=tau, av=av, title='Random Walk', legend=LEGEND[0])
+		plot_loglog_av(ax=axs[1], tau=tau, av=av, title='Random Walk', legend=legend)
 
 		# C. AC of 3 GM (T=2000) realization with different color and legends
 		tau, av = allan_var(gm_2000[0])
-		plot_loglog_av(ax=axs[2], tau=tau, av=av, title='Gauss Markov - tau=2000', legend=LEGEND[0])
+		plot_loglog_av(ax=axs[2], tau=tau, av=av, title='Gauss Markov - tau=2000', legend=legend)
 
 		# D. AC of 3 GM (T=500) realization with different color and legends
 		tau, av = allan_var(gm_500[0])
-		plot_loglog_av(ax=axs[3], tau=tau, av=av, title='Gauss Markov - tau=500', legend=LEGEND[0])
+		plot_loglog_av(ax=axs[3], tau=tau, av=av, title='Gauss Markov - tau=500', legend=legend)
 
 		if do_savefig:
 			save_fig(fig=fig, name='AVar', folder=IMAGES_FOLDER)
