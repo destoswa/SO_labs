@@ -24,10 +24,10 @@ def gauss_markov(wn, tau, dt=1):
 	return gm
 
 
-def autocorr_norm(x):
+def autocorr(x):
 	ac = np.correlate(x, x, mode='full')
-	ac_norm = (ac - np.min(ac)) / (np.max(ac) - np.min(ac))
-	return ac_norm
+	ac = (ac - np.min(ac)) / (np.max(ac) - np.min(ac))
+	return ac
 
 
 def psd(x, dt=1):
@@ -41,6 +41,7 @@ def allan_var(x, dt=1):
 
 def save_realization(name, serie, folder='./data/realizations/'):
 	np.savetxt(folder + name + '.txt', serie.T, delimiter=';', fmt='%.8f')
+
 
 # plot functions
 

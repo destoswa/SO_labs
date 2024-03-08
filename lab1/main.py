@@ -2,13 +2,12 @@ from tools import *
 
 
 def main():
-
 	# hyper-param
-	random_seed = 42
+	random_seed = 404
 	wn_std = 2
 	length = int(2e5)
 	n_series = 3
-	LEGEND = ['Real '+str(i+1) for i in range(n_series)]
+	LEGEND = ['Real ' + str(i + 1) for i in range(n_series)]
 
 	# flags
 	do_ac = True
@@ -34,17 +33,14 @@ def main():
 	gm_500 = gauss_markov(wn, tau=500, dt=1)
 	plot_1(ax=axs[3], serie=gm_500, title='1st order Gauss-Markov process, tau = 500', legend=LEGEND)
 
-	
 	# save results
-
 	if do_savefig:
 		save_fig(fig=fig, name='Fig_1')
 
-	save_realization('WN', wn)
-	save_realization('RW', rw)
-	save_realization('GM_2000', gm_2000)
-	save_realization('GM_500', gm_500)
-	
+	save_realization(name='WN', serie=wn)
+	save_realization(name='RW', serie=rw)
+	save_realization(name='GM_2000', serie=gm_2000)
+	save_realization(name='GM_500', serie=gm_500)
 
 	# 4. Noise characteristics for each sequence
 	# 4.a AutoCorrelation
@@ -53,19 +49,19 @@ def main():
 		x = range(-length + 1, length)
 
 		# A. AC of 3 WN realization with different color and legends
-		ac_wn = [autocorr_norm(wn[i]) for i in range(n_series)]
+		ac_wn = [autocorr(wn[i]) for i in range(n_series)]
 		plot_ac(ax=axs[0], x=x, serie=ac_wn, title='White Noise', legend=LEGEND)
 
 		# B. AC of 3 RW realization with different color and legends
-		ac_rw = [autocorr_norm(rw[i]) for i in range(n_series)]
+		ac_rw = [autocorr(rw[i]) for i in range(n_series)]
 		plot_ac(ax=axs[1], x=x, serie=ac_rw, title='Random Walk', legend=LEGEND)
 
 		# C. AC of 3 GM (T=2000) realization with different color and legends
-		ac_gm_2000 = [autocorr_norm(gm_2000[i]) for i in range(n_series)]
+		ac_gm_2000 = [autocorr(gm_2000[i]) for i in range(n_series)]
 		plot_ac(ax=axs[2], x=x, serie=ac_gm_2000, title='Gauss Markov - tau=2000', legend=LEGEND)
 
 		# D. AC of 3 GM (T=500) realization with different color and legends
-		ac_gm_500 = [autocorr_norm(gm_500[i]) for i in range(n_series)]
+		ac_gm_500 = [autocorr(gm_500[i]) for i in range(n_series)]
 		plot_ac(ax=axs[3], x=x, serie=ac_gm_500, title='Gauss Markov - tau=500', legend=LEGEND)
 
 		if do_savefig:
@@ -120,11 +116,29 @@ def main():
 
 	plt.show()
 
-# 5.
-# Compute the parameters of stochastic processes and compare your findings with the
-# values determined by the online tool for noise characterization via GMWM1. It is
-# sufficient to upload one sequence for each noise.
+	# 5. With realization 1
 
+	# 5a White Noise parameters : std and mean of the white noise
+	wn_measured_mean = np.mean(wn[0])
+	wn_measured_std = np.std(wn[0])
+	print(f'Statistics about white noise realization 1 : ')
+	print(f'True mean = 0, measured mean = {wn_measured_mean}')
+	print(f'True std = {wn_std}, measured std = {wn_measured_std}')
+
+
+# 5b Random Walk
+# rw_measured_wn_mean
+# rw_measured_wn_std
+
+# 5c 1st order Gauss-Markov tau=2000 process parameters, white noise mean and std + correlation time
+# gm_2000_measured_wn_mean
+# gm_2000_measured_wn_std
+# gm_2000_measured_tau
+
+# 5d 1st order Gauss-Markov tau=500 process parameters, white noise mean and std + correlation time
+# gm_500_measured_wn_mean
+# gm_500_measured_wn_std
+# gm_500_measured_tau
 
 if __name__ == '__main__':
 	main()
