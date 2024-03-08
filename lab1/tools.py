@@ -39,6 +39,9 @@ def allan_var(x, dt=1):
 	return tau, av
 
 
+def save_realization(name, serie, folder='./data/realizations/'):
+	np.savetxt(folder + name + '.txt', serie.T, delimiter=';', fmt='%.8f')
+
 # plot functions
 
 def create_subfigs(title, shape):
@@ -87,7 +90,7 @@ def plot_loglog_av(ax, tau, av, title, legend):
 	ax.legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25))
 
 
-def save_fig(fig, name, folder):
+def save_fig(fig, name, folder="./data/images/"):
 	fig.savefig(folder + "svg/" + name + '.svg', format='svg')
 	fig.savefig(folder + "png/" + name + '.png', format='png')
 # fig.savefig(folder + "eps/" + name + '.eps', format='eps')

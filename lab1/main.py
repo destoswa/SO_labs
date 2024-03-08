@@ -2,8 +2,6 @@ from tools import *
 
 
 def main():
-	# paths
-	IMAGES_FOLDER = "./data/images/"
 
 	# hyper-param
 	random_seed = 42
@@ -18,34 +16,36 @@ def main():
 	do_av = True
 	do_savefig = True
 
-	# ===========================================
-	# =========== PART A ========================
-	# ===========================================
-
 	fig, axs = create_subfigs(title='Type of noises', shape=(4, 1))
 
-	# A. 3 WN realization with different color and legends
+	# 1. 3 WN realization with different color and legends
 	wn = white_noise(n_series=n_series, length=length, std=wn_std, random_seed=random_seed)
 	plot_1(ax=axs[0], serie=wn, title='White noises', legend=LEGEND, linewidth=0.1)
 
-	# B. 3 RW realization with different color and legends
+	# 2. 3 RW realization with different color and legends
 	rw = random_walk(wn)
 	plot_1(ax=axs[1], serie=rw, title='Random walks', legend=LEGEND)
 
-	# C. 3 GM (T=2000) realization with different color and legends
+	# 3a. 3 GM (T=2000) realization with different color and legends
 	gm_2000 = gauss_markov(wn, tau=2000, dt=1)
 	plot_1(ax=axs[2], serie=gm_2000, title='1st order Gauss-Markov process, tau = 2000', legend=LEGEND)
 
-	# D. 3 GM (T=500) realization with different color and legends
+	# 3b. 3 GM (T=500) realization with different color and legends
 	gm_500 = gauss_markov(wn, tau=500, dt=1)
 	plot_1(ax=axs[3], serie=gm_500, title='1st order Gauss-Markov process, tau = 500', legend=LEGEND)
 
-	if do_savefig:
-		save_fig(fig=fig, name='Fig_1', folder=IMAGES_FOLDER)
+	
+	# save results
 
-	# ===========================================
-	# =========== PART B ========================
-	# ===========================================
+	if do_savefig:
+		save_fig(fig=fig, name='Fig_1')
+
+	save_realization('WN', wn)
+	save_realization('RW', rw)
+	save_realization('GM_2000', gm_2000)
+	save_realization('GM_500', gm_500)
+	
+
 	# 4. Noise characteristics for each sequence
 	# 4.a AutoCorrelation
 	if do_ac:
@@ -69,7 +69,7 @@ def main():
 		plot_ac(ax=axs[3], x=x, serie=ac_gm_500, title='Gauss Markov - tau=500', legend=LEGEND)
 
 		if do_savefig:
-			save_fig(fig=fig, name='AC', folder=IMAGES_FOLDER)
+			save_fig(fig=fig, name='AC')
 
 	# 4.b Power-Spectral_Density
 	if do_psd:
@@ -92,7 +92,7 @@ def main():
 		plot_psd(ax=axs[3], psd=gm_500_psd, title='Gauss Markov - tau=500', legend=LEGEND)
 
 		if do_savefig:
-			save_fig(fig=fig, name='PSD', folder=IMAGES_FOLDER)
+			save_fig(fig=fig, name='PSD')
 
 	# 4.c Allan Variance
 	if do_av:
@@ -116,11 +116,14 @@ def main():
 		plot_loglog_av(ax=axs[3], tau=tau, av=av, title='Gauss Markov - tau=500', legend=legend)
 
 		if do_savefig:
-			save_fig(fig=fig, name='AVar', folder=IMAGES_FOLDER)
+			save_fig(fig=fig, name='AVar')
 
 	plt.show()
 
-# 6.
+# 5.
+# Compute the parameters of stochastic processes and compare your findings with the
+# values determined by the online tool for noise characterization via GMWM1. It is
+# sufficient to upload one sequence for each noise.
 
 
 if __name__ == '__main__':
