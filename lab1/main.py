@@ -73,19 +73,19 @@ def main():
 
 		# A. AC of 3 WN realization with different color and legends
 		wn_psd = [psd(wn[i]) for i in range(n_series)]
-		plot_psd(ax=axs[0], psd=wn_psd, title='White Noise', legend=LEGEND)
+		plot_psd(ax=axs[0], serie=wn_psd, title='White Noise', legend=LEGEND)
 
 		# B. AC of 3 RW realization with different color and legends
 		rw_psd = [psd(rw[i]) for i in range(n_series)]
-		plot_psd(ax=axs[1], psd=rw_psd, title='Random Walk', legend=LEGEND)
+		plot_psd(ax=axs[1], serie=rw_psd, title='Random Walk', legend=LEGEND)
 
 		# C. AC of 3 GM (T=2000) realization with different color and legends
 		gm_2000_psd = [psd(gm_2000[i]) for i in range(n_series)]
-		plot_psd(ax=axs[2], psd=gm_2000_psd, title='Gauss Markov - tau=2000', legend=LEGEND)
+		plot_psd(ax=axs[2], serie=gm_2000_psd, title='Gauss Markov - tau=2000', legend=LEGEND)
 
 		# D. AC of 3 GM (T=500) realization with different color and legends
 		gm_500_psd = [psd(gm_500[i]) for i in range(n_series)]
-		plot_psd(ax=axs[3], psd=gm_500_psd, title='Gauss Markov - tau=500', legend=LEGEND)
+		plot_psd(ax=axs[3], serie=gm_500_psd, title='Gauss Markov - tau=500', legend=LEGEND)
 
 		if do_savefig:
 			save_fig(fig=fig, name='PSD')

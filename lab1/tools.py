@@ -26,7 +26,7 @@ def gauss_markov(wn, tau, dt=1):
 
 def autocorr(x):
 	ac = np.correlate(x, x, mode='full')
-	ac = (ac - np.min(ac)) / (np.max(ac) - np.min(ac))
+	# ac = (ac - np.min(ac)) / (np.max(ac) - np.min(ac))
 	return ac
 
 
@@ -76,10 +76,10 @@ def plot_ac(ax, x, serie, title, legend):
 	ax.legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
 
 
-def plot_psd(ax, psd, title, legend):
-	n_psd = len(psd)
+def plot_psd(ax, serie, title, legend):
+	n_psd = len(serie)
 	for i in range(n_psd):
-		f1, S1 = psd[i]
+		f1, S1 = serie[i]
 		ax.plot(f1, S1)
 	ax.set_title(title)
 	ax.legend(legend, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=3)
