@@ -68,9 +68,6 @@ def main():
 		if do_savefig:
 			save_fig(fig=fig, name='AC')
 
-		print(np.mean(np.equal(ac_gm_500, ac_gm_2000)))
-		print(np.mean(np.equal(ac_gm_500, ac_rw)))
-
 	# 4.b Power-Spectral_Density
 	if do_psd:
 		fig, axs = create_subfigs(title="Power Spectral Density", shape=(4, 1))
