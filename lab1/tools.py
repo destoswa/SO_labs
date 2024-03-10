@@ -31,12 +31,21 @@ def autocorr(x):
 
 
 def psd(x, dt=1):
-	return signal.welch(x, fs=dt, return_onesided=False, scaling='spectrum')
+	return signal.welch(x, fs=dt, return_onesided=False, scaling='density')
 
 
 def allan_var(x, dt=1):
 	tau, av = allan_variance(x, dt, input_type='increment')
 	return tau, av
+
+
+def find_gm_tau_from_ac(ac_gm):
+	ac_gm = ac_gm[len(ac_gm)//2:] # Only use the positive x data
+	peak = np.max(ac_gm)
+	y_tau = peak / np.e
+	dif = np.abs(ac_gm - y_tau)
+	tau = dif.argmin()
+	return tau
 
 
 def save_realization(name, serie, folder='./data/realizations/'):

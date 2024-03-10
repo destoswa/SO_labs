@@ -4,6 +4,7 @@ from tools import *
 def main():
 	# hyper-param
 	random_seed = 404
+	wn_mean = 0
 	wn_std = 2
 	length = int(2e5)
 	n_series = 3
@@ -18,7 +19,7 @@ def main():
 	fig, axs = create_subfigs(title='Type of noises', shape=(4, 1))
 
 	# 1. 3 WN realization with different color and legends
-	wn = white_noise(n_series=n_series, length=length, std=wn_std, random_seed=random_seed)
+	wn = white_noise(n_series=n_series, length=length, mean=wn_mean, std=wn_std, random_seed=random_seed)
 	plot_1(ax=axs[0], serie=wn, title='White noises', legend=LEGEND, linewidth=0.1)
 
 	# 2. 3 RW realization with different color and legends
@@ -67,6 +68,9 @@ def main():
 		if do_savefig:
 			save_fig(fig=fig, name='AC')
 
+		print(np.mean(np.equal(ac_gm_500, ac_gm_2000)))
+		print(np.mean(np.equal(ac_gm_500, ac_rw)))
+
 	# 4.b Power-Spectral_Density
 	if do_psd:
 		fig, axs = create_subfigs(title="Power Spectral Density", shape=(4, 1))
@@ -114,31 +118,62 @@ def main():
 		if do_savefig:
 			save_fig(fig=fig, name='AVar')
 
-	plt.show()
-
 	# 5. With realization 1
 
 	# 5a White Noise parameters : std and mean of the white noise
 	wn_measured_mean = np.mean(wn[0])
 	wn_measured_std = np.std(wn[0])
+
+	print()
 	print(f'Statistics about white noise realization 1 : ')
-	print(f'True mean = 0, measured mean = {wn_measured_mean}')
-	print(f'True std = {wn_std}, measured std = {wn_measured_std}')
+	print(f'True mean = {wn_mean}, measured wn mean = {wn_measured_mean}')
+	print(f'True std = {wn_std}, measured wn std = {wn_measured_std}')
 
+	# 5b Random Walk
+	# RW(t) = RW(t-1) + WN[t-1]
+	rw_wn = rw[0, 1:] - rw[0, :-1]
+	rw_wn_mean = np.mean(rw_wn)
+	rw_wn_std = np.std(rw_wn)
 
-# 5b Random Walk
-# rw_measured_wn_mean
-# rw_measured_wn_std
+	print()
+	print(f'Statistics about random_walk realization 1 : ')
+	print(f'True wn mean = {wn_mean}, measured wn mean = {rw_wn_mean}')
+	print(f'True wn std = {wn_std}, measured wn std = {rw_wn_std}')
 
-# 5c 1st order Gauss-Markov tau=2000 process parameters, white noise mean and std + correlation time
-# gm_2000_measured_wn_mean
-# gm_2000_measured_wn_std
-# gm_2000_measured_tau
+	# 5c 1st order Gauss-Markov tau=2000 process parameters, white noise mean and std + correlation time
+	# GM[t] = GM[t-1]*exp(-beta*dt)+ WN[t-1]
+	tau = find_gm_tau_from_ac(ac_gm_2000[0])  # tau derived from plot
+	beta = 1 / tau
+	dt = 1
 
-# 5d 1st order Gauss-Markov tau=500 process parameters, white noise mean and std + correlation time
-# gm_500_measured_wn_mean
-# gm_500_measured_wn_std
-# gm_500_measured_tau
+	gm_2000_wn = gm_2000[0, 1:] - gm_2000[0, :-1] * np.exp(-beta * dt)
+	gm_2000_wn_mean = np.mean(gm_2000_wn)
+	gm_2000_wn_std = np.std(gm_2000_wn)
+
+	print()
+	print(f'Statistics about Gauss-Markov_tau2000 realization 1 : ')
+	print(f'True tau = {2000}, tau derived from autocorelation (tau = x s.t. y[x]=y[0]*exp(-1)) = {tau}')
+	print(f'True wn mean = {wn_mean}, measured wn mean = {gm_2000_wn_mean}')
+	print(f'True wn std = {wn_std}, measured wn std = {gm_2000_wn_std}')
+
+	# 5d 1st order Gauss-Markov tau=500 process parameters, white noise mean and std + correlation time
+	# GM[t] = GM[t-1]*exp(-beta*dt)+ WN[t]
+
+	tau = find_gm_tau_from_ac(ac_gm_500[0])  # tau derived from plot
+	beta = 1 / tau
+	dt = 1
+
+	gm_500_wn = gm_500[0, 1:] - gm_500[0, :-1] * np.exp(-beta * dt)
+	gm_500_wn_mean = np.mean(gm_500_wn)
+	gm_500_wn_std = np.std(gm_500_wn)
+	print()
+	print(f'Statistics about Gauss-Markov_tau500 realization 1 : ')
+	print(f'True tau = {500}, tau derived from autocorelation (tau = x s.t. y[x]=y[0]*exp(-1)) = {tau}')
+	print(f'True wn mean = {wn_mean}, measured wn mean = {gm_500_wn_mean}')
+	print(f'True wn std = {wn_std}, measured wn std = {gm_500_wn_std}')
+
+	plt.show()
+
 
 if __name__ == '__main__':
 	main()
