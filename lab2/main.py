@@ -15,11 +15,12 @@ initial_vel_E = param.OMEGA_L*param.RADIUS
 acc_x, acc_y, gyro = generate_measurements()
 
 # Integration
-orientation = initial_orientation + np.cumsum(gyro*param.DELTA_T)
-theta_serie = orientation - initial_orientation  # Can we assume this relation as known ?
+theta_serie = np.cumsum(gyro*param.DELTA_T)  # Can we assume this relation as known ?
+theta_serie -= theta_serie[0]  # Initial angle at 0 rad
+orientation = initial_orientation + theta_serie
 
-acc_N = acc_x * np.cos(orientation) - acc_y * np.sin(orientation)
-acc_E = acc_x * np.sin(orientation) + acc_y * np.cos(orientation)
+acc_E = - acc_y * np.sin(theta_serie) + acc_x * np.cos(theta_serie)
+acc_N = - acc_y * np.cos(theta_serie) - acc_x * np.sin(theta_serie)
 
 vel_N = initial_vel_N + np.cumsum(acc_N*param.DELTA_T)
 vel_E = initial_vel_E + np.cumsum(acc_E*param.DELTA_T)
@@ -29,7 +30,7 @@ pos_E = initial_pos_E + np.cumsum(vel_E*param.DELTA_T)
 
 # Plots
 
-# True values
+# True values
 true_time, true_theta, true_pos_E, true_pos_N, true_vel_E, true_vel_N, true_acc_E, true_acc_N, true_angular_vel = generate_ref()
 
 # Evolution of state
@@ -81,9 +82,9 @@ axs[3].legend()
 fig.savefig('data/deviation.jpg')
 
 # Estimated trajectory
-plt.clf()
+plt.figure(figsize=(10,10))
 plt.scatter(pos_E, pos_N, label='estimated trajectory', alpha=0.8, marker=',', linewidths=0.1)
 plt.savefig('data/trajectory.jpg')
 plt.savefig('data/trajectory.svg')
 
-
+print(theta_serie[0])
