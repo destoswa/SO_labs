@@ -3,12 +3,12 @@ import numpy as np
 from reference import generate_ref
 
 
-def generate_measurements():
-	_, theta, _, _, _, _, acc_E, acc_N, angular_vel = generate_ref()
+def generate_measurements(noise=None):
 
 	# Measurement in B_frame
-	acc_x = acc_E * np.cos(theta) - acc_N * np.sin(theta)
-	acc_y = -acc_E * np.sin(theta) - acc_N * np.cos(theta)
-	gyro = angular_vel
+	time = np.arange(0, param.SIMULATION_TIME + param.DELTA_T, param.DELTA_T)
+	acc_x = np.full_like(a=time, fill_value=0)
+	acc_y = np.full_like(a=time, fill_value=param.OMEGA**2 * param.RADIUS)
+	gyro = np.full_like(a=time, fill_value=param.OMEGA)
 
-	return (acc_x, acc_y, gyro)
+	return time, acc_x, acc_y, gyro
