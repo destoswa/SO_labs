@@ -2,9 +2,10 @@ import param
 import numpy as np
 
 
-def generate_ref():
+def generate_ref(freq):
+	dt = 1/freq
 	# Perfect measurements, we know acc_x, acc_y, gyro are constants
-	time = np.arange(0, param.SIMULATION_TIME + param.DELTA_T, param.DELTA_T)
+	time = np.arange(0, param.SIMULATION_TIME + dt, dt)
 	acc_x = 0
 	acc_y = param.OMEGA ** 2 * param.RADIUS
 	gyro = param.OMEGA
@@ -50,5 +51,15 @@ def generate_ref():
 			- double_integ_acc_E(acc_x, acc_y, gyro, param.AZIMUTH_0)
 			+ param.P_0_EAST
 	)
-
-	return time, theta, pos_E, pos_N, vel_E, vel_N, acc_E, acc_N, gyro
+	results = {
+		'time': time,
+		'theta': theta,
+		'pos_E': pos_E,
+		'pos_N': pos_N,
+		'vel_E': vel_E,
+		'vel_N': vel_N,
+		'acc_E': acc_E,
+		'acc_N': acc_N,
+		'angular_vel': gyro,
+	}
+	return results
