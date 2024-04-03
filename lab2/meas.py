@@ -1,6 +1,5 @@
 import param
 import numpy as np
-from reference import generate_ref
 
 
 def generate_measurements(freq, noise=None):

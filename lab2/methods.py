@@ -4,7 +4,6 @@ import param
 
 
 def integration(acc_x, acc_y, gyro, radius, azimuth_0, omega, freq=10, order=1):
-    print(f'============ order {order} - freq {freq} ============')
     dt = 1/freq
     # Initial conditions, assume known
     initial_orientation = azimuth_0

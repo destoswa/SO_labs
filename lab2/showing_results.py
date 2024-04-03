@@ -37,6 +37,7 @@ def show_evolution(true_res, res, azimuth_0, prefix, src):
     axs[3, 1].legend()
 
     fig.savefig(src + '/' + prefix + 'states.jpg')
+    plt.close()
 
 
 def show_deviation(true_res, res, azimuth_0, prefix, src):
@@ -59,30 +60,57 @@ def show_deviation(true_res, res, azimuth_0, prefix, src):
     axs[3].legend()
 
     fig.savefig(src + '/' + prefix + 'deviation.jpg')
+    plt.close()
 
 
 def show_trajectory(res, prefix, src):
     # Estimated trajectory
+    plt.rcParams.update({'font.size': 22})
     plt.figure(figsize=(10, 10))
-    plt.scatter(res['pos_E'], res['pos_N'], label='estimated trajectory', alpha=0.8, marker=',', linewidths=0.1)
+    plt.scatter(res['pos_E'], res['pos_N'], label='estimated trajectory', marker='.', alpha=0.8, linewidths=0.1)
+    plt.xlabel('E axis [m]')
+    plt.ylabel('N axis [m]')
+    plt.title(prefix + 'Trajectory')
+    plt.tight_layout()
     plt.savefig(src + '/' + prefix + 'trajectory.jpg')
     plt.savefig(src + '/' + prefix + 'trajectory.svg')
+
+    plt.figure(figsize=(10, 4))
+    plt.scatter(res['pos_E'], res['pos_N'], label='estimated trajectory', marker='.', alpha=0.8, linewidths=0.1)
+    plt.xlabel('E axis [m]')
+    plt.ylabel('N axis [m]')
+    plt.ylim([480, 520])
+    plt.xlim([-100, 100])
+    plt.tight_layout()
+    plt.title(prefix + 'Trajectory - Zoom')
+    plt.savefig(src + '/' + prefix + 'trajectory_zoom.jpg')
+    plt.savefig(src + '/' + prefix + 'trajectory_zoom.svg')
+    plt.close()
 
 
 def show_error(true_res, res, prefix, src):
     fig, axs = plt.subplots(3, 1, figsize=(10, 8))
-    fig.suptitle('Errors')
     # Azimuth
     axs[0].plot(true_res['time'], np.abs(true_res['theta'] - res['orientation']))
     axs[0].set_ylabel('Azimuth [rad]')
     # Velocity
-    axs[1].plot(true_res['time'], np.abs(true_res['vel_E'] - res['vel_E']))
-    axs[1].plot(true_res['time'], np.abs(true_res['vel_N'] - res['vel_N']))
+    axs[1].plot(true_res['time'], np.abs(true_res['vel_E'] - res['vel_E']), label="vel_E")
+    axs[1].plot(true_res['time'], np.abs(true_res['vel_N'] - res['vel_N']), label="vel_N")
     axs[1].set_ylabel('velocity [m/s]')
+    axs[1].legend()
     # Position
-    axs[2].plot(true_res['time'], np.abs(true_res['pos_E'] - res['pos_E']))
-    axs[2].plot(true_res['time'], np.abs(true_res['pos_N'] - res['pos_N']))
+    axs[2].plot(true_res['time'], np.abs(true_res['pos_E'] - res['pos_E']), label='pos_E')
+    axs[2].plot(true_res['time'], np.abs(true_res['pos_N'] - res['pos_N']), label='pos_N')
     axs[2].set_ylabel('Position [m]')
     axs[2].set_xlabel('steps [-]')
+    axs[2].legend()
 
     plt.savefig(src + '/' + prefix + 'errors.jpg')
+    plt.savefig(src + '/' + prefix + 'errors.svg')
+    plt.close()
+
+    # Print max error:
+    print("MAX ERROR - " + prefix)
+    print(f"\t- maximum error on Azimuth is {np.max(np.abs(true_res['theta'] - res['orientation']))}")
+    print(f"\t- maximum error on Velocity is {np.max(np.concatenate((np.abs(true_res['vel_E'] - res['vel_E']), np.abs(true_res['vel_N'] - res['vel_N']))))}")
+    print(f"\t- maximum error on Position is {np.max(np.concatenate((np.abs(true_res['pos_E'] - res['pos_E']), np.abs(true_res['pos_N'] - res['pos_N']))))}")
