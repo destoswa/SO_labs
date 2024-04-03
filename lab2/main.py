@@ -25,7 +25,6 @@ sr_res_100Hz_order2 = integration(acc_x_100, acc_y_100, gyro_100,
                                            param.RADIUS, param.AZIMUTH_0,
                                            param.OMEGA, freq=100, order=2)
 
-
 # True values
 true_res_10 = generate_ref(freq=10)
 true_res_100 = generate_ref(freq=100)
@@ -56,3 +55,9 @@ show_trajectory(sr_res_100Hz_order2, prefix='100Hz_order2_', src='./data')
 # true trajectory
 show_trajectory(true_res_10, prefix='10Hz_true_', src='./data')
 show_trajectory(true_res_100, prefix='100Hz_true_', src='./data')
+
+# Part 4 - compare trajectories to true values
+show_error(true_res_10, sr_res_10Hz_order1, prefix='10Hz_order1_', src='./data')
+show_error(true_res_100, sr_res_100Hz_order1, prefix='100Hz_order1_', src='./data')
+show_error(true_res_10, sr_res_10Hz_order2, prefix='10Hz_order2_', src='./data')
+show_error(true_res_100, sr_res_100Hz_order2, prefix='100Hz_order2_', src='./data')

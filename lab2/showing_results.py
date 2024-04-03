@@ -67,3 +67,22 @@ def show_trajectory(res, prefix, src):
     plt.scatter(res['pos_E'], res['pos_N'], label='estimated trajectory', alpha=0.8, marker=',', linewidths=0.1)
     plt.savefig(src + '/' + prefix + 'trajectory.jpg')
     plt.savefig(src + '/' + prefix + 'trajectory.svg')
+
+
+def show_error(true_res, res, prefix, src):
+    fig, axs = plt.subplots(3, 1, figsize=(10, 8))
+    fig.suptitle('Errors')
+    # Azimuth
+    axs[0].plot(true_res['time'], np.abs(true_res['theta'] - res['orientation']))
+    axs[0].set_ylabel('Azimuth [rad]')
+    # Velocity
+    axs[1].plot(true_res['time'], np.abs(true_res['vel_E'] - res['vel_E']))
+    axs[1].plot(true_res['time'], np.abs(true_res['vel_N'] - res['vel_N']))
+    axs[1].set_ylabel('velocity [m/s]')
+    # Position
+    axs[2].plot(true_res['time'], np.abs(true_res['pos_E'] - res['pos_E']))
+    axs[2].plot(true_res['time'], np.abs(true_res['pos_N'] - res['pos_N']))
+    axs[2].set_ylabel('Position [m]')
+    axs[2].set_xlabel('steps [-]')
+
+    plt.savefig(src + '/' + prefix + 'errors.jpg')
