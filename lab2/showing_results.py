@@ -112,5 +112,10 @@ def show_error(true_res, res, prefix, src):
     # Print max error:
     print("MAX ERROR - " + prefix)
     print(f"\t- maximum error on Azimuth is {np.max(np.abs(true_res['theta'] - res['orientation']))}")
-    print(f"\t- maximum error on Velocity is {np.max(np.concatenate((np.abs(true_res['vel_E'] - res['vel_E']), np.abs(true_res['vel_N'] - res['vel_N']))))}")
-    print(f"\t- maximum error on Position is {np.max(np.concatenate((np.abs(true_res['pos_E'] - res['pos_E']), np.abs(true_res['pos_N'] - res['pos_N']))))}")
+    print(f"\t- maximum error on Velocity")
+    print(f"\t\t V_E : {np.max((np.abs(true_res['vel_E'] - res['vel_E'])))}")
+    print(f"\t\t V_N : {np.max((np.abs(true_res['vel_N'] - res['vel_N'])))}")
+    print(f"\t- maximum error on Position")
+    print(f"\t\t P_E : {np.max((np.abs(true_res['pos_E'] - res['pos_E'])))}")
+    print(f"\t\t P_N : {np.max((np.abs(true_res['pos_N'] - res['pos_N'])))}")
+
