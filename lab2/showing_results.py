@@ -86,9 +86,11 @@ def show_trajectory(res, prefix, src):
     plt.savefig(src + '/' + prefix + 'trajectory_zoom.jpg')
     plt.savefig(src + '/' + prefix + 'trajectory_zoom.svg')
     plt.close()
+    plt.rcParams.update({'font.size': 10})
 
 
 def show_error(true_res, res, prefix, src):
+    plt.rcParams.update({'font.size': 16})
     fig, axs = plt.subplots(3, 1, figsize=(10, 8))
     # Azimuth
     axs[0].plot(true_res['time'], np.abs(true_res['theta'] - (res['orientation'] - np.pi/2)))
@@ -105,9 +107,11 @@ def show_error(true_res, res, prefix, src):
     axs[2].set_xlabel('steps [-]')
     axs[2].legend()
 
+    plt.tight_layout()
     plt.savefig(src + '/' + prefix + 'errors.jpg')
     plt.savefig(src + '/' + prefix + 'errors.svg')
     plt.close()
+    plt.rcParams.update({'font.size': 10})
 
     # Print max error:
     print("MAX ERROR - " + prefix)
