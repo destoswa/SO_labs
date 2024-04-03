@@ -91,7 +91,7 @@ def show_trajectory(res, prefix, src):
 def show_error(true_res, res, prefix, src):
     fig, axs = plt.subplots(3, 1, figsize=(10, 8))
     # Azimuth
-    axs[0].plot(true_res['time'], np.abs(true_res['theta'] - res['orientation']))
+    axs[0].plot(true_res['time'], np.abs(true_res['theta'] - (res['orientation'] - np.pi/2)))
     axs[0].set_ylabel('Azimuth [rad]')
     # Velocity
     axs[1].plot(true_res['time'], np.abs(true_res['vel_E'] - res['vel_E']), label="vel_E")
@@ -111,7 +111,7 @@ def show_error(true_res, res, prefix, src):
 
     # Print max error:
     print("MAX ERROR - " + prefix)
-    print(f"\t- maximum error on Azimuth is {np.max(np.abs(true_res['theta'] - res['orientation']))}")
+    print(f"\t- maximum error on Azimuth is {np.max(np.abs(true_res['theta'] - (res['orientation'] - np.pi / 2)))}")
     print(f"\t- maximum error on Velocity")
     print(f"\t\t V_E : {np.max((np.abs(true_res['vel_E'] - res['vel_E'])))}")
     print(f"\t\t V_N : {np.max((np.abs(true_res['vel_N'] - res['vel_N'])))}")
