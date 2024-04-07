@@ -20,36 +20,36 @@ def generate_ref(freq):
 	acc_E = acc_x * np.sin(azimuth) + acc_y * np.cos(azimuth)
 
 	# Velocities and positions in N and E, based on (double) integration of acceleration over time and initial conditions
-	def integ_acc_N(acc_x, acc_y, gyro, azimuth):
+	def integral_acc_north(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return acc_x * np.sin(azimuth) / d_azimuth_dt + acc_y * np.cos(azimuth) / d_azimuth_dt
 
-	vel_N = integ_acc_N(acc_x, acc_y, gyro, azimuth) - integ_acc_N(acc_x, acc_y, gyro, param.AZIMUTH_0) + param.V_0_NORTH
+	vel_N = integral_acc_north(acc_x, acc_y, gyro, azimuth) - integral_acc_north(acc_x, acc_y, gyro, param.AZIMUTH_0) + param.V_0_NORTH
 
-	def double_integ_acc_N(acc_x, acc_y, gyro, azimuth):
+	def double_integral_acc_north(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return - acc_x * np.cos(azimuth) / d_azimuth_dt ** 2 + acc_y * np.sin(azimuth) / d_azimuth_dt ** 2
 
 	pos_N = (
-			double_integ_acc_N(acc_x, acc_y, gyro, azimuth)
-			- double_integ_acc_N(acc_x, acc_y, gyro, param.AZIMUTH_0)
+			double_integral_acc_north(acc_x, acc_y, gyro, azimuth)
+			- double_integral_acc_north(acc_x, acc_y, gyro, param.AZIMUTH_0)
 			+ param.P_0_NORTH
 	)
 
 	# 	integration of acc_E and vel_E
-	def integ_acc_E(acc_x, acc_y, gyro, azimuth):
+	def integral_acc_east(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return - acc_x * np.cos(azimuth) / d_azimuth_dt + acc_y * np.sin(azimuth) / d_azimuth_dt
 
-	vel_E = integ_acc_E(acc_x, acc_y, gyro, azimuth) - integ_acc_E(acc_x, acc_y, gyro, param.AZIMUTH_0) + param.V_0_EAST
+	vel_E = integral_acc_east(acc_x, acc_y, gyro, azimuth) - integral_acc_east(acc_x, acc_y, gyro, param.AZIMUTH_0) + param.V_0_EAST
 
-	def double_integ_acc_E(acc_x, acc_y, gyro, azimuth):
+	def double_integral_acc_east(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return - acc_x * np.sin(azimuth) / d_azimuth_dt ** 2 - acc_y * np.cos(azimuth) / d_azimuth_dt ** 2
 
 	pos_E = (
-			double_integ_acc_E(acc_x, acc_y, gyro, azimuth)
-			- double_integ_acc_E(acc_x, acc_y, gyro, param.AZIMUTH_0)
+			double_integral_acc_east(acc_x, acc_y, gyro, azimuth)
+			- double_integral_acc_east(acc_x, acc_y, gyro, param.AZIMUTH_0)
 			+ param.P_0_EAST
 	)
 	results = {
