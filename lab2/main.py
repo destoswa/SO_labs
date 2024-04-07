@@ -19,10 +19,7 @@ def main():
 	case_100Hz_order1.integrate()
 	case_100Hz_order2.integrate()
 
-	# =============================================
-	# ======= PLOTTING RESULTS ====================
-	# =============================================
-
+	# Compute results : plots (trajectory, states evolution in time, errors) and maximal errors report
 	case_10Hz_true.compute_results()
 	case_100Hz_true.compute_results()
 	case_10Hz_order1.compute_results()
