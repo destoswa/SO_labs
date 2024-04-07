@@ -11,12 +11,17 @@ EXTENSIONS = ['jpg', 'svg']
 
 
 def create_folder(folder):
+	"""
+	Create folder if it does not exist
+	"""
 	if not os.path.exists(folder):
 		os.mkdir(path=folder)
 
 
 def create_folders(prefix, src, extensions=None):
-
+	"""
+	Create all required results folders for a simulation case
+	"""
 	# Report folders
 	report_folder = f'{src}/error_reports/'
 	create_folder(report_folder)
@@ -39,6 +44,9 @@ Plots
 
 
 def save_fig(fig, src, prefix, plot_name, extensions=None):
+	"""
+	Save fig with correct pathfile in all specified extensions
+	"""
 	if extensions is None:
 		extensions = EXTENSIONS
 	paths = [f"{src}/{extension}/{prefix}/{prefix}_{plot_name}.{extension}" for extension in extensions]
@@ -47,6 +55,10 @@ def save_fig(fig, src, prefix, plot_name, extensions=None):
 
 
 def show_evolution(true_res, res, prefix, src, add_acc=False):
+	"""
+	Create subplots with the evolution of states (orientation, position, velocity, OPTIONAL acceleration) in time
+	Comparison between true_res states and res states
+	"""
 	# Evolution of state
 	plot_name = 'states'
 	fig, axs = plt.subplots(4 if add_acc else 3, 2, figsize=(10, 8))
@@ -108,6 +120,9 @@ def show_evolution(true_res, res, prefix, src, add_acc=False):
 
 
 def show_trajectory(res, prefix, src):
+	"""
+	Create plot with trajectory of res + additional plot zoomed on starting point
+	"""
 	# Estimated trajectory
 	plt.rcParams.update({'font.size': 22})
 	fig = plt.figure(figsize=(10, 10))
@@ -132,11 +147,18 @@ def show_trajectory(res, prefix, src):
 
 
 def show_error(true_res, res, prefix, src, add_acc=False):
-	plot_name = 'errors'
+	"""
+	Plot the difference between states of true_res (true states) and res (approximation of states)
+	states : orientation, position, velocity, OPTIONAL acceleration
 
+	Saves and display the maximal absolute error for each state
+	"""
+	plot_name = 'errors'
 	plt.rcParams.update({'font.size': 16})
+
 	fig, axs = plt.subplots(4 if add_acc else 3, 1, figsize=(10, 8))
 	fig.suptitle('Deviation from true trajectory (PVA)', fontsize=16)
+
 	# Azimuth
 	axs[0].plot(true_res['time'], res['orientation'] - true_res['orientation'])
 	axs[0].set_ylabel(f'Azimuth [{ANGLE_UNIT}]')
@@ -168,7 +190,7 @@ def show_error(true_res, res, prefix, src, add_acc=False):
 	plt.rcParams.update({'font.size': 10})
 
 	# Maximal error report
-	max_error_report = (f"MAX ERROR - {prefix}"
+	max_error_report = (f"MAX ABSOLUTE ERROR - {prefix}"
 						f"\n\t- On azimuth "
 						f"\n\t\t {np.max(np.abs(true_res['theta'] - (res['orientation'] - np.pi / 2))):.3E} [{ANGLE_UNIT}]"
 						f"\n\t- On position"

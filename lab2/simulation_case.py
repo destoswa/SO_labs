@@ -1,7 +1,7 @@
 import param
 from reference import generate_ref
-from meas import generate_measurements
-from methods import integration
+from measurements import generate_measurements
+from calculus_methods import integration
 from showing_results import *
 
 

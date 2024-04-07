@@ -50,15 +50,3 @@ def integration(acc_x, acc_y, gyro, tetha_0, orientation_0, pos_N_0, pos_E_0, ve
         'pos_N': pos_N,
     }
     return results
-
-
-"""def main():
-    time, acc_x, acc_y, gyro = generate_measurements()
-    sr_res_10Hz_order2 = integration(acc_x, acc_y, gyro,
-                                     param.RADIUS, param.AZIMUTH_0,
-                                     param.OMEGA, freq=10, order=2)
-
-
-if __name__ == '__main__':
-    main()
-"""
