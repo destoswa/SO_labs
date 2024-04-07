@@ -9,7 +9,7 @@ class SimulationCase:
 	"""
 	Class defining a simulation case by its frequency and order of integration
 	All other parameters are defined in param.py and are common to all cases
-	It is also possible to instantiate true cases
+	It is also possible to instantiate true cases (no estimation, only true values)
 
 	This class implement all methods useful to a simulation case :
 		- Generate measurements in instantiation of the case
@@ -17,11 +17,13 @@ class SimulationCase:
 		- Generate results/plots with the estimations
 	"""
 
-	def __init__(self, result_dir, freq, order=1, true_case=False, include_acc=False):
+	def __init__(self, result_dir, freq=1, order=1, true_case=False, include_acc=False):
+
 		self.result_dir = result_dir
 		self.freq = freq
 		self.order = order
 		self.true_res = generate_ref(freq)
+
 		self.true_case = true_case
 		self.include_acc = include_acc
 
@@ -37,6 +39,9 @@ class SimulationCase:
 		"""
 		Estimate the states of the simulation via integration of measurements with method of order self.order
 		"""
+		if self.true_case:
+			return
+
 		self.res = integration(
 			acc_x=self.res['acc_x'],
 			acc_y=self.res['acc_y'],
