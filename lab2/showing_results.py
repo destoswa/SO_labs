@@ -16,9 +16,14 @@ def create_folder(folder):
 
 
 def create_folders(prefix, src, extensions=None):
+
+	# Report folders
+	report_folder = f'{src}/error_reports/'
+	create_folder(report_folder)
+
+	# Plot folders
 	if extensions is None:
 		extensions = EXTENSIONS
-
 	extensions_folders = [f"{src}{extension}/" for extension in extensions]
 	for extensions_folder in extensions_folders:
 		create_folder(extensions_folder)
@@ -181,24 +186,6 @@ def show_error(true_res, res, prefix, src, add_acc=False):
 
 	# Print and save the max error report
 	print(max_error_report)
-	with open(src + 'max_error_report.txt', 'w') as f:
+	path = f'{src}error_reports/max_error_report_{prefix}.txt'
+	with open(path, 'w') as f:
 		f.write(max_error_report)
-
-
-def show_results(src, prefix, res, true_res, include_acc, true_case=False):
-	""" Create plots for each case
-			- Trajectory
-			- States over time (azimuth, position, velocity)
-			- Errors (deviation with true values) for all states
-			- Print maximal errors for each state
-
-			Optional : you can also include acceleration in plots with the include_acc boolean argument
-			Optional : you can specify if the case is a true case to avoid printing the trivial null errors
-	"""
-	create_folders(prefix=prefix, src=src)
-	show_trajectory(res, prefix=prefix, src=src)
-	show_evolution(true_res, res, prefix=prefix, src=src,
-				   add_acc=include_acc)
-	if not true_case:
-		show_error(true_res, res, prefix=prefix, src=src,
-				   add_acc=include_acc)

@@ -1,94 +1,34 @@
-import param
-from reference import generate_ref
-from meas import generate_measurements
-from methods import integration
-from showing_results import *
+from simulation_case import SimulationCase
+
+RESULT_DIRECTORY = './data/'
+INCLUDE_ACCELERATION_IN_RESULTS = False
 
 
 def main():
-	# Measurements
-	time_10, acc_x_10, acc_y_10, gyro_10 = generate_measurements(freq=10)
-	time_100, acc_x_100, acc_y_100, gyro_100 = generate_measurements(freq=100)
+	# Instantiation of simulation cases
+	case_10Hz_true = SimulationCase(result_dir=RESULT_DIRECTORY, freq=10, true_case=True, include_acc=INCLUDE_ACCELERATION_IN_RESULTS)
+	case_100Hz_true = SimulationCase(result_dir=RESULT_DIRECTORY, freq=10, true_case=True, include_acc=INCLUDE_ACCELERATION_IN_RESULTS)
+	case_10Hz_order1 = SimulationCase(result_dir=RESULT_DIRECTORY, freq=10, order=1, include_acc=INCLUDE_ACCELERATION_IN_RESULTS)
+	case_10Hz_order2 = SimulationCase(result_dir=RESULT_DIRECTORY, freq=10, order=2, include_acc=INCLUDE_ACCELERATION_IN_RESULTS)
+	case_100Hz_order1 = SimulationCase(result_dir=RESULT_DIRECTORY, freq=100, order=1, include_acc=INCLUDE_ACCELERATION_IN_RESULTS)
+	case_100Hz_order2 = SimulationCase(result_dir=RESULT_DIRECTORY, freq=100, order=2, include_acc=INCLUDE_ACCELERATION_IN_RESULTS)
 
-	# True values
-	true_res_10 = generate_ref(freq=10)
-	true_res_100 = generate_ref(freq=100)
-
-	# Integration
-	res_10Hz_order1 = integration(acc_x_10, acc_y_10, gyro_10,
-									 param.RADIUS, param.AZIMUTH_0,
-									 param.OMEGA, freq=10, order=1)
-	res_100Hz_order1 = integration(acc_x_100, acc_y_100, gyro_100,
-									  param.RADIUS, param.AZIMUTH_0,
-									  param.OMEGA, freq=100, order=1)
-	res_10Hz_order2 = integration(acc_x_10, acc_y_10, gyro_10,
-									 param.RADIUS, param.AZIMUTH_0,
-									 param.OMEGA, freq=10, order=2)
-	res_100Hz_order2 = integration(acc_x_100, acc_y_100, gyro_100,
-									  param.RADIUS, param.AZIMUTH_0,
-									  param.OMEGA, freq=100, order=2)
+	# Integration of measurement to get estimation of orientation, position and velocity
+	case_10Hz_order1.integrate()
+	case_10Hz_order2.integrate()
+	case_100Hz_order1.integrate()
+	case_100Hz_order2.integrate()
 
 	# =============================================
 	# ======= PLOTTING RESULTS ====================
 	# =============================================
 
-	results_dir = './data/'
-	include_acceleration_in_plots = False
-
-	# True trajectory
-	show_results(
-		src=results_dir,
-		prefix='10Hz_true',
-		res=true_res_10,
-		true_res=true_res_10,
-		include_acc=include_acceleration_in_plots,
-		true_case=True
-	)
-
-	show_results(
-		src=results_dir,
-		prefix='100Hz_true',
-		res=true_res_100,
-		true_res=true_res_100,
-		include_acc=include_acceleration_in_plots,
-		true_case=True
-	)
-
-	# order 1 - freq 10Hz
-	show_results(
-		src=results_dir,
-		prefix='10Hz_order1',
-		res=res_10Hz_order1,
-		true_res=true_res_10,
-		include_acc=include_acceleration_in_plots
-	)
-
-	# order 1 - freq 100Hz
-	show_results(
-		src=results_dir,
-		prefix='100Hz_order1',
-		res=res_100Hz_order1,
-		true_res=true_res_100,
-		include_acc=include_acceleration_in_plots
-	)
-
-	# order 2 - freq 10Hz
-	show_results(
-		src=results_dir,
-		prefix='10Hz_order2',
-		res=res_10Hz_order2,
-		true_res=true_res_10,
-		include_acc=include_acceleration_in_plots
-	)
-
-	# order 2 - freq 100Hz
-	show_results(
-		src=results_dir,
-		prefix='100Hz_order2',
-		res=res_100Hz_order2,
-		true_res=true_res_100,
-		include_acc=include_acceleration_in_plots
-	)
+	case_10Hz_true.compute_results()
+	case_100Hz_true.compute_results()
+	case_10Hz_order1.compute_results()
+	case_10Hz_order2.compute_results()
+	case_100Hz_order1.compute_results()
+	case_100Hz_order2.compute_results()
 
 
 if __name__ == '__main__':

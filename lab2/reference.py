@@ -3,6 +3,17 @@ import numpy as np
 
 
 def generate_ref(freq):
+	"""
+	The method may be a bit overkilled, but generalize well to many cases
+	Parameters
+	----------
+	freq : frequency of sampling
+
+	Returns
+	-------
+	true states of the case (orientation, position, velocity, time, ...), sampled at given frequency
+
+	"""
 
 	# Perfect measurements, we know acc_x, acc_y, gyro are constants
 	dt = 1 / freq
@@ -11,47 +22,52 @@ def generate_ref(freq):
 	acc_y = param.OMEGA ** 2 * param.RADIUS
 	gyro = param.OMEGA
 
-	# Theoretical values
+	# Perfect theta and azimuth
 	theta = param.THETA_0 + time * gyro
 	azimuth = param.AZIMUTH_0 + theta
 
-	# Accelerations in N and E
+	# Perfect accelerations in N and E
 	acc_N = acc_x * np.cos(azimuth) - acc_y * np.sin(azimuth)
 	acc_E = acc_x * np.sin(azimuth) + acc_y * np.cos(azimuth)
 
-	# Velocities and positions in N and E, based on (double) integration of acceleration over time and initial conditions
+	# Perfect velocities and positions in N and E,
+	# based on integration (resp. double integration) of acceleration over time and initial conditions
+
+	# 	Vel_N and Pos_N
 	def integral_acc_north(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return acc_x * np.sin(azimuth) / d_azimuth_dt + acc_y * np.cos(azimuth) / d_azimuth_dt
-
-	vel_N = integral_acc_north(acc_x, acc_y, gyro, azimuth) - integral_acc_north(acc_x, acc_y, gyro, param.AZIMUTH_0) + param.V_0_NORTH
 
 	def double_integral_acc_north(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return - acc_x * np.cos(azimuth) / d_azimuth_dt ** 2 + acc_y * np.sin(azimuth) / d_azimuth_dt ** 2
 
+	vel_N = integral_acc_north(acc_x, acc_y, gyro, azimuth) - integral_acc_north(acc_x, acc_y, gyro,
+																				 param.AZIMUTH_0) + param.V_0_NORTH
 	pos_N = (
 			double_integral_acc_north(acc_x, acc_y, gyro, azimuth)
 			- double_integral_acc_north(acc_x, acc_y, gyro, param.AZIMUTH_0)
 			+ param.P_0_NORTH
 	)
 
-	# 	integration of acc_E and vel_E
+	# 	Vel_E and Pos_E
 	def integral_acc_east(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return - acc_x * np.cos(azimuth) / d_azimuth_dt + acc_y * np.sin(azimuth) / d_azimuth_dt
-
-	vel_E = integral_acc_east(acc_x, acc_y, gyro, azimuth) - integral_acc_east(acc_x, acc_y, gyro, param.AZIMUTH_0) + param.V_0_EAST
 
 	def double_integral_acc_east(acc_x, acc_y, gyro, azimuth):
 		d_azimuth_dt = gyro
 		return - acc_x * np.sin(azimuth) / d_azimuth_dt ** 2 - acc_y * np.cos(azimuth) / d_azimuth_dt ** 2
 
+	vel_E = integral_acc_east(acc_x, acc_y, gyro, azimuth) - integral_acc_east(acc_x, acc_y, gyro,
+																			   param.AZIMUTH_0) + param.V_0_EAST
 	pos_E = (
 			double_integral_acc_east(acc_x, acc_y, gyro, azimuth)
 			- double_integral_acc_east(acc_x, acc_y, gyro, param.AZIMUTH_0)
 			+ param.P_0_EAST
 	)
+
+	# All references states in a dictionary
 	results = {
 		'time': time,
 		'theta': theta,
