@@ -15,16 +15,16 @@ def main():
 	true_res_100 = generate_ref(freq=100)
 
 	# Integration
-	sr_res_10Hz_order1 = integration(acc_x_10, acc_y_10, gyro_10,
+	res_10Hz_order1 = integration(acc_x_10, acc_y_10, gyro_10,
 									 param.RADIUS, param.AZIMUTH_0,
 									 param.OMEGA, freq=10, order=1)
-	sr_res_100Hz_order1 = integration(acc_x_100, acc_y_100, gyro_100,
+	res_100Hz_order1 = integration(acc_x_100, acc_y_100, gyro_100,
 									  param.RADIUS, param.AZIMUTH_0,
 									  param.OMEGA, freq=100, order=1)
-	sr_res_10Hz_order2 = integration(acc_x_10, acc_y_10, gyro_10,
+	res_10Hz_order2 = integration(acc_x_10, acc_y_10, gyro_10,
 									 param.RADIUS, param.AZIMUTH_0,
 									 param.OMEGA, freq=10, order=2)
-	sr_res_100Hz_order2 = integration(acc_x_100, acc_y_100, gyro_100,
+	res_100Hz_order2 = integration(acc_x_100, acc_y_100, gyro_100,
 									  param.RADIUS, param.AZIMUTH_0,
 									  param.OMEGA, freq=100, order=2)
 
@@ -36,19 +36,29 @@ def main():
 	include_acceleration_in_plots = False
 
 	# True trajectory
-	prefix = '10Hz_true'
-	create_folders(prefix=prefix, src=results_dir)
-	show_trajectory(true_res_10, prefix=prefix, src=results_dir)
+	show_results(
+		src=results_dir,
+		prefix='10Hz_true',
+		res=true_res_10,
+		true_res=true_res_10,
+		include_acc=include_acceleration_in_plots,
+		true_case=True
+	)
 
-	prefix = '100Hz_true'
-	create_folders(prefix=prefix, src=results_dir)
-	show_trajectory(true_res_100, prefix=prefix, src=results_dir)
+	show_results(
+		src=results_dir,
+		prefix='100Hz_true',
+		res=true_res_100,
+		true_res=true_res_100,
+		include_acc=include_acceleration_in_plots,
+		true_case=True
+	)
 
 	# order 1 - freq 10Hz
 	show_results(
 		src=results_dir,
 		prefix='10Hz_order1',
-		sr_res=sr_res_10Hz_order1,
+		res=res_10Hz_order1,
 		true_res=true_res_10,
 		include_acc=include_acceleration_in_plots
 	)
@@ -57,7 +67,7 @@ def main():
 	show_results(
 		src=results_dir,
 		prefix='100Hz_order1',
-		sr_res=sr_res_100Hz_order1,
+		res=res_100Hz_order1,
 		true_res=true_res_100,
 		include_acc=include_acceleration_in_plots
 	)
@@ -66,7 +76,7 @@ def main():
 	show_results(
 		src=results_dir,
 		prefix='10Hz_order2',
-		sr_res=sr_res_10Hz_order2,
+		res=res_10Hz_order2,
 		true_res=true_res_10,
 		include_acc=include_acceleration_in_plots
 	)
@@ -75,7 +85,7 @@ def main():
 	show_results(
 		src=results_dir,
 		prefix='100Hz_order2',
-		sr_res=sr_res_100Hz_order2,
+		res=res_100Hz_order2,
 		true_res=true_res_100,
 		include_acc=include_acceleration_in_plots
 	)

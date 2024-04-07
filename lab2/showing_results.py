@@ -185,7 +185,7 @@ def show_error(true_res, res, prefix, src, add_acc=False):
 		f.write(max_error_report)
 
 
-def show_results(src, prefix, sr_res, true_res, include_acc):
+def show_results(src, prefix, res, true_res, include_acc, true_case=False):
 	""" Create plots for each case
 			- Trajectory
 			- States over time (azimuth, position, velocity)
@@ -193,10 +193,12 @@ def show_results(src, prefix, sr_res, true_res, include_acc):
 			- Print maximal errors for each state
 
 			Optional : you can also include acceleration in plots with the include_acc boolean argument
+			Optional : you can specify if the case is a true case to avoid printing the trivial null errors
 	"""
 	create_folders(prefix=prefix, src=src)
-	show_trajectory(sr_res, prefix=prefix, src=src)
-	show_evolution(true_res, sr_res, prefix=prefix, src=src,
+	show_trajectory(res, prefix=prefix, src=src)
+	show_evolution(true_res, res, prefix=prefix, src=src,
 				   add_acc=include_acc)
-	show_error(true_res, sr_res, prefix=prefix, src=src,
-			   add_acc=include_acc)
+	if not true_case:
+		show_error(true_res, res, prefix=prefix, src=src,
+				   add_acc=include_acc)
