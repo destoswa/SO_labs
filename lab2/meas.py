@@ -2,7 +2,7 @@ import param
 import numpy as np
 
 
-def generate_measurements(freq, noise=None):
+def generate_measurements(freq):
 	dt = 1/freq
 
 	# Measurement in B_frame
