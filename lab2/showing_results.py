@@ -114,7 +114,7 @@ def show_trajectory(res, prefix, src):
 	plt.scatter(res['pos_E'], res['pos_N'], label='estimated trajectory', marker='.', alpha=0.8, linewidths=0.1)
 	plt.xlabel(f'E axis [{LENGTH_UNIT}]')
 	plt.ylabel(f'N axis [{LENGTH_UNIT}]')
-	plt.title(prefix + 'Trajectory')
+	plt.title(f'Trajectory : {prefix}')
 	plt.tight_layout()
 	save_fig(fig, src, prefix, plot_name='trajectory')
 
@@ -125,7 +125,7 @@ def show_trajectory(res, prefix, src):
 	plt.ylim([480, 520])
 	plt.xlim([-100, 100])
 	plt.tight_layout()
-	plt.title(prefix + 'Trajectory - Zoom')
+	plt.title(f'Trajectory - zoom : {prefix}')
 	save_fig(fig, src, prefix, plot_name='trajectory_zoom')
 	plt.close()
 	plt.rcParams.update({'font.size': 10})
@@ -136,6 +136,7 @@ def show_error(true_res, res, prefix, src, add_acc=False):
 
 	plt.rcParams.update({'font.size': 16})
 	fig, axs = plt.subplots(4 if add_acc else 3, 1, figsize=(10, 8))
+	fig.suptitle('Deviation from true trajectory (PVA)', fontsize=16)
 	# Azimuth
 	axs[0].plot(true_res['time'], res['orientation'] - true_res['orientation'])
 	axs[0].set_ylabel(f'Azimuth [{ANGLE_UNIT}]')

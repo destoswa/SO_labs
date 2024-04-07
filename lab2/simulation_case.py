@@ -17,15 +17,12 @@ class SimulationCase:
 		- Generate results/plots with the estimations
 	"""
 
-	def __init__(self, result_dir, freq=1, order=1, true_case=False, include_acc=False):
+	def __init__(self, freq=1, order=1, true_case=False):
 
-		self.result_dir = result_dir
 		self.freq = freq
 		self.order = order
 		self.true_res = generate_ref(freq)
-
 		self.true_case = true_case
-		self.include_acc = include_acc
 
 		if true_case:
 			self.prefix = f"{freq}Hz_true"
@@ -56,7 +53,7 @@ class SimulationCase:
 			order=self.order
 		)
 
-	def compute_results(self):
+	def compute_results(self, result_dir, include_acc=False):
 		"""
 		Create folder for plots
 		Create plots
@@ -65,10 +62,10 @@ class SimulationCase:
 			Errors (deviation with true values) for all states (for non-true case)
 			Print maximal errors for each state (for non-true case)
 		"""
-		create_folders(prefix=self.prefix, src=self.result_dir)
-		show_trajectory(self.res, prefix=self.prefix, src=self.result_dir)
-		show_evolution(self.true_res, self.res, prefix=self.prefix, src=self.result_dir,
-					   add_acc=self.include_acc)
+		create_folders(prefix=self.prefix, src=result_dir)
+		show_trajectory(self.res, prefix=self.prefix, src=result_dir)
+		show_evolution(self.true_res, self.res, prefix=self.prefix, src=result_dir,
+					   add_acc=include_acc)
 		if not self.true_case:
-			show_error(self.true_res, self.res, prefix=self.prefix, src=self.result_dir,
-					   add_acc=self.include_acc)
+			show_error(self.true_res, self.res, prefix=self.prefix, src=result_dir,
+					   add_acc=include_acc)
