@@ -75,29 +75,29 @@ def show_error(result_dir, simulation_case, add_acc=False):
 	n_rows = 4 if add_acc else 3
 	fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(10, 8))
 	fig.suptitle('Deviation from true trajectory (PVA)', fontsize=16)
-	axs[-1].set_title(f'Time {TIME_UNIT}')
+	axs[-1].set_xlabel(f'Time [{TIME_UNIT}]')
 
 	# Azimuth
 	axs[0].plot(time, trajectory.azimuth - true_trajectory.azimuth)
-	axs[0].set_ylabel(f'Azimuth {ANGLE_UNIT}', rotation=0, size='large')
+	axs[0].set_ylabel(f'Azimuth [{ANGLE_UNIT}]', size='large')
 
 	# Position
 	axs[1].plot(time, trajectory.p_E - true_trajectory.p_E, label='East')
 	axs[1].plot(time, trajectory.p_N - true_trajectory.p_N, label='North')
-	axs[1].set_ylabel(f'Position {LENGTH_UNIT}', rotation=0, size='large')
+	axs[1].set_ylabel(f'Position [{LENGTH_UNIT}]', size='large')
 	axs[1].legend()
 
 	# Velocity
 	axs[2].plot(time, trajectory.v_E - true_trajectory.v_E, label='East')
 	axs[2].plot(time, trajectory.v_N - true_trajectory.v_N, label='North')
-	axs[2].set_ylabel(f'Velocity {LENGTH_UNIT}/{TIME_UNIT}', rotation=0, size='large')
+	axs[2].set_ylabel(f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]', size='large')
 	axs[2].legend()
 
 	# Acceleration
 	if add_acc:
 		axs[3].plot(time, trajectory.acc_E - true_trajectory.acc_E, label='East')
 		axs[3].plot(time, trajectory.acc_N - true_trajectory.acc_N, label='North')
-		axs[3].set_ylabel(f'Acceleration {LENGTH_UNIT}/{TIME_UNIT}²', rotation=0, size='large')
+		axs[3].set_ylabel(f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]', size='large')
 		axs[3].legend()
 
 	fig.align_ylabels()

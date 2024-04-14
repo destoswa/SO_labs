@@ -62,4 +62,4 @@ def compare_order_and_freq():  # Lab2 new code
 
 if __name__ == '__main__':
 	main()
-	compare_order_and_freq()  # Lab2
+	#compare_order_and_freq()  # Lab2

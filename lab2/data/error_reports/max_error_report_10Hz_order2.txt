@@ -1,0 +1,9 @@
+MAX ABSOLUTE ERROR - 10Hz_order2
+	- On azimuth 
+		 2.522E-13 [rad]
+	- On position
+		 P_E : 2.865E-03 [m]
+		 P_N : 1.645E-03 [m]
+	- On velocity
+		 V_E : 1.571E+01 [m/s]
+		 V_N : 1.292E-05 [m/s]

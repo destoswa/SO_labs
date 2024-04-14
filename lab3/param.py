@@ -33,11 +33,13 @@ INITIAL_CONDITIONS = {
 # Sensor noise specs
 acc_specs = {
 	'B': {'bias': 1.3E-3 * ACC_GRAVITY},  # m/s²
-	'WN': {'sd_wn_psd': 5.5917E-3 }  # m/s²/sample
+	'WN': {'sd_wn_psd': 5.5917E-3}  # m/s²/sample
 }
 
 gyro_specs = {
 	'B': {'bias': 150 * np.pi / 180 / 3600},  # rad/s
-	'RW': {'sd_wn_psd': 9.259259E-5 * np.pi},  # rad/s/sample
-	'GM': {'sd_gm_psd': 3.888888E-4 * np.pi, 'tau': 100}  # resp. rad/s/sample and s
+	'RW': {'sd_wn_psd': 0.1 * np.pi / 180 * np.sqrt(SIMULATION_TIME/3600) / (FREQ*SIMULATION_TIME)},  # rad/s/sample
+	'GM': {'sd_gm_psd': 0.007 * np.pi / 180 * np.sqrt(FREQ) / (FREQ * SIMULATION_TIME), 'tau': 100}  # resp. rad/s/sample and s
+	#'RW': {'sd_wn_psd': 9.259259E-5 * np.pi},  # rad/s/sample
+	#'GM': {'sd_gm_psd': 3.888888E-4 * np.pi, 'tau': 100}  # resp. rad/s/sample and s
 }

@@ -74,9 +74,10 @@ def random_walk(size, sd):
 
 def gauss_markov(size, tau, dt, sd):
 	wn = white_noise(size, sd=sd)
-	length = wn.shape[1]
+	length = wn.shape[0]
 	beta = 1 / tau
 	gm = np.zeros_like(wn)  # Assume gm[0] = 0
 	for i in range(1, length):
-		gm[:, i] = gm[:, i - 1] * np.exp(-beta * dt) + wn[:, i - 1]
+		#gm[:, i] = gm[:, i - 1] * np.exp(-beta * dt) + wn[:, i - 1]
+		gm[i] = gm[i - 1] * np.exp(-beta * dt) + wn[i - 1]
 	return gm
