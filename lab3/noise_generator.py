@@ -8,29 +8,28 @@ class NoiseModel:
 	def __init__(self, noise_type, noise_specs):
 		self.noise_type = noise_type
 		self.noise_specs = noise_specs
-		self.noise = None
 
 	def generate_and_add_to_signal(self, signal, freq):
 		size = np.size(signal)
 
 		if self.noise_type == 'B':
 			bias = self.noise_specs['bias']
-			self.noise = bias_noise(size, bias)
-
+			noise = bias_noise(size, bias)
 		elif self.noise_type == 'WN':
-			sd_psd = self.noise_specs['sd_psd']
-			self.noise = white_noise(size=size, dt=1/freq, sd_psd=sd_psd)
-
+			sd_psd = self.noise_specs['sd_wn_psd']
+			noise = white_noise(size=size, dt=1/freq, sd_psd=sd_psd)
+		elif self.noise_type == 'RW':
+			sd_psd = self.noise_specs['sd_wn_psd']
+			noise = random_walk(size=size, dt=1 / freq, sd_psd=sd_psd)
 		elif self.noise_type == 'GM':
-			sd_psd = self.noise_specs['sd_psd']
+			sd_psd = self.noise_specs['sd_gm_psd']
 			tau = self.noise_specs['tau']
-			self.noise = gauss_markov(size=size, freq=freq, sd_psd=sd_psd, tau=tau)
-
+			noise = gauss_markov(size=size, freq=freq, sd_psd=sd_psd, tau=tau)
 		else:
 			print(f'This noise type is not implemented : {self.noise_type}')
 			raise ValueError
 
-		noisy_signal = signal + self.noise
+		noisy_signal = signal + noise
 
 		return noisy_signal
 
@@ -65,6 +64,12 @@ def bias_noise(size, bias):
 def white_noise(size, dt, sd_psd):  # TODO : Implement
 	print('NOT_IMPLEMENTED : white_noise(size, dt, sd_psd)')
 	return 0
+
+
+def random_walk(size, dt, sd_psd):
+	wn = white_noise(size, dt, sd_psd)
+	rw = np.cumsum(wn, axis=1)
+	return rw
 
 
 def gauss_markov(size, freq, sd_psd, tau):  # TODO : Implement

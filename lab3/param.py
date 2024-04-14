@@ -5,10 +5,10 @@ Define all params of Lab 3
 """
 # Simulation parameter
 SIMULATION_TIME = 200
-FREQ = 10
-ORDER = 1
 PLOTS_DIR = './data/'
 RANDOM_SEED = 42
+FREQ = 100
+ORDER = 2
 
 # Convention : Units & constants
 LENGTH_UNIT = 'm'
@@ -30,16 +30,14 @@ INITIAL_CONDITIONS = {
 	'v_E': OMEGA*RADIUS
 }
 
-# Noises specifics
-# TODO : Convert values to SI units
-ACC_NOISE_SPECS = {
+# Sensor noise specs
+acc_specs = {
 	'B': {'bias': 1.3E-3 * ACC_GRAVITY},  # m/s²
-	'WN': {'sd_psd': None}  # m/s²/sample
+	'WN': {'sd_wn_psd': None}  # m/s²/sample
 }
 
-GYRO_NOISE_SPECS = {
+gyro_specs = {
 	'B': {'bias': 150 * np.pi / 180 / 3600},  # rad/s
-	'WN': {'sd_psd': None},  				  # rad/s/sample
-	'GM': {'sd_psd': None, 'tau': 100}  # resp. rad/s/sample and s
+	'RW': {'sd_wn_psd': None},  # rad/s/sample
+	'GM': {'sd_gm_psd': None, 'tau': 100}  # resp. rad/s/sample and s
 }
-
