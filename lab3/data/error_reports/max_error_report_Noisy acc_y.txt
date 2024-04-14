@@ -2,8 +2,8 @@ MAX ABSOLUTE ERROR - Noisy acc_y
 	- On azimuth 
 		 2.114E-12 [rad]
 	- On position
-		 P_E : 8.914E-01 [m]
-		 P_N : 5.957E-01 [m]
+		 P_E : 3.905E-01 [m]
+		 P_N : 3.893E-01 [m]
 	- On velocity
-		 V_E : 9.636E-03 [m/s]
-		 V_N : 7.194E-03 [m/s]
+		 V_E : 5.716E-03 [m/s]
+		 V_N : 7.166E-03 [m/s]

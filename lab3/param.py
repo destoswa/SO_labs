@@ -33,7 +33,8 @@ INITIAL_CONDITIONS = {
 # Sensor noise specs
 acc_specs = {
 	'B': {'bias': 1.3E-3 * ACC_GRAVITY},  # m/s²
-	'WN': {'sd_wn_psd': 5.5917E-3}  # m/s²/sample
+	'WN': {'sd_wn_psd': 57e-6 * ACC_GRAVITY * np.sqrt(FREQ)}  # m/s²/sample
+	#'WN': {'sd_wn_psd': 5.5917E-3}  # m/s²/sample
 }
 
 gyro_specs = {
