@@ -22,6 +22,10 @@ def create_folders(prefix, src, extensions=None):
 	"""
 	Create all required results folders for a simulation case
 	"""
+
+	# Result folder
+	create_folder(src)
+
 	# Report folders
 	report_folder = f'{src}/error_reports/'
 	create_folder(report_folder)

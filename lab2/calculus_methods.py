@@ -19,6 +19,7 @@ def integration(acc_x, acc_y, gyro, tetha_0, orientation_0, pos_N_0, pos_E_0, ve
     pos_N = np.zeros_like(acc_N)
     pos_E = np.zeros_like(acc_E)
     if order == 1:
+
         # computing velocities
         vel_N = vel_N_0 + np.cumsum(acc_N * dt)
         vel_E = vel_E_0 + np.cumsum(acc_E * dt)
