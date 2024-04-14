@@ -5,6 +5,7 @@ class NoiseModel:
 	"""
 	A NoiseModel instance allows to generate a noise w.r.t to the noise characteristics (noise_specs) and add to signal
 	"""
+
 	def __init__(self, noise_type, noise_specs):
 		self.noise_type = noise_type
 		self.noise_specs = noise_specs
@@ -17,14 +18,14 @@ class NoiseModel:
 			noise = bias_noise(size, bias)
 		elif self.noise_type == 'WN':
 			sd_psd = self.noise_specs['sd_wn_psd']
-			noise = white_noise(size=size, dt=1/freq, sd_psd=sd_psd)
+			noise = white_noise(size, sd=sd_psd)
 		elif self.noise_type == 'RW':
 			sd_psd = self.noise_specs['sd_wn_psd']
-			noise = random_walk(size=size, dt=1 / freq, sd_psd=sd_psd)
+			noise = random_walk(size, sd= sd_psd)
 		elif self.noise_type == 'GM':
 			sd_psd = self.noise_specs['sd_gm_psd']
 			tau = self.noise_specs['tau']
-			noise = gauss_markov(size=size, freq=freq, sd_psd=sd_psd, tau=tau)
+			noise = gauss_markov(size=size, tau=tau, dt=1/freq, sd=sd_psd)
 		else:
 			print(f'This noise type is not implemented : {self.noise_type}')
 			raise ValueError
@@ -61,17 +62,21 @@ def bias_noise(size, bias):
 	return np.random.normal(size=size, scale=bias)
 
 
-def white_noise(size, dt, sd_psd):  # TODO : Implement
-	print('NOT_IMPLEMENTED : white_noise(size, dt, sd_psd)')
-	return 0
+def white_noise(size, sd):
+	return sd * np.random.randn(size)
 
 
-def random_walk(size, dt, sd_psd):
-	wn = white_noise(size, dt, sd_psd)
-	rw = np.cumsum(wn, axis=1)
+def random_walk(size, sd):
+	wn = white_noise(size, sd=sd)
+	rw = np.cumsum(wn)
 	return rw
 
 
-def gauss_markov(size, freq, sd_psd, tau):  # TODO : Implement
-	print('NOT_IMPLEMENTED : gauss_markov(size, freq, sd_psd, tau)')
-	return 0
+def gauss_markov(size, tau, dt, sd):
+	wn = white_noise(size, sd=sd)
+	length = wn.shape[1]
+	beta = 1 / tau
+	gm = np.zeros_like(wn)  # Assume gm[0] = 0
+	for i in range(1, length):
+		gm[:, i] = gm[:, i - 1] * np.exp(-beta * dt) + wn[:, i - 1]
+	return gm
