@@ -62,11 +62,11 @@ def bias_noise(size, bias):
 	return np.random.normal(size=size, scale=bias)
 
 
-def white_noise(size, dt, sd_psd):
+def white_noise(size, dt, sd_psd):  # TODO : Implement
 	print('NOT_IMPLEMENTED : white_noise(size, dt, sd_psd)')
 	return 0
 
 
-def gauss_markov(size, freq, sd_psd, tau):
+def gauss_markov(size, freq, sd_psd, tau):  # TODO : Implement
 	print('NOT_IMPLEMENTED : gauss_markov(size, freq, sd_psd, tau)')
 	return 0

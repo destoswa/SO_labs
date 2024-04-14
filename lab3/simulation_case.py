@@ -35,7 +35,7 @@ class SimulationCase:
 		new_case.true_trajectory = self.true_trajectory  # TODO : DeepCopy ?
 		return new_case
 
-	def plot_reference_trajectory(self, result_dir, include_acc, prefix=None):
+	def plot_reference_trajectory(self, result_dir, include_acc=False, prefix=None):
 		reference_case = self.__copy__()
 		reference_case.prefix = 'True trajectory' if prefix is None else prefix
 		reference_case.trajectory = reference_case.true_trajectory

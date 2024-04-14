@@ -31,7 +31,7 @@ INITIAL_CONDITIONS = {
 }
 
 # Noises specifics
-
+# TODO : Convert values to SI units
 ACC_NOISE_SPECS = {
 	'B': {'bias': 1.3E-3 * ACC_GRAVITY},  # m/s²
 	'WN': {'sd_psd': None}  # m/s²/sample

@@ -29,12 +29,12 @@ def main():
 	[case.compute_trajectory(order=pm.ORDER) for case in cases]
 
 	# Plot trajectories (2D trajectory, states evolution in time, errors)
-	[case.plot_trajectory(result_dir=pm.PLOTS_DIR, include_acc=pm.ACC_IN_PLOTS) for case in cases]
-	case_all_noise.plot_reference_trajectory(result_dir=pm.PLOTS_DIR, include_acc=pm.ACC_IN_PLOTS)
+	[case.plot_trajectory(result_dir=pm.PLOTS_DIR) for case in cases]
+	case_all_noise.plot_reference_trajectory(result_dir=pm.PLOTS_DIR)
 
 
-def compare_order_and_freq():  # Lab2
-	# Measurements
+def compare_order_and_freq():  # Lab2 new code
+	# Nominal measurements
 	meas_10 = ms.Measurements(freq=10)
 	meas_100 = ms.Measurements(freq=100)
 
@@ -51,13 +51,13 @@ def compare_order_and_freq():  # Lab2
 	case_o2_100.compute_trajectory(order=2)
 
 	# Plot
-	case_o1_10.plot_trajectory(result_dir=pm.PLOTS_DIR, include_acc=True)
-	case_o2_10.plot_trajectory(result_dir=pm.PLOTS_DIR, include_acc=True)
-	case_o1_100.plot_trajectory(result_dir=pm.PLOTS_DIR, include_acc=True)
-	case_o2_100.plot_trajectory(result_dir=pm.PLOTS_DIR, include_acc=True)
-	case_o1_100.plot_reference_trajectory(result_dir=pm.PLOTS_DIR, include_acc=True, prefix='True_100Hz')
+	case_o1_10.plot_trajectory(result_dir=pm.PLOTS_DIR)
+	case_o2_10.plot_trajectory(result_dir=pm.PLOTS_DIR)
+	case_o1_100.plot_trajectory(result_dir=pm.PLOTS_DIR)
+	case_o2_100.plot_trajectory(result_dir=pm.PLOTS_DIR)
+	case_o1_100.plot_reference_trajectory(result_dir=pm.PLOTS_DIR, prefix='True_100Hz')
 
 
 if __name__ == '__main__':
 	main()
-	# compare_order_and_freq()
+	compare_order_and_freq()  # Lab2
