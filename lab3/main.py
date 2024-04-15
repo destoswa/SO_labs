@@ -17,9 +17,9 @@ def main():
 	# Create the measurements
 	meas_noisy_all = sensor_collection.measure(pm.FREQ)
 	meas_nominal = meas_noisy_all.filter_noise()
-	meas_noisy_acc_x = meas_noisy_all.isolate_noise(id='acc_x')
-	meas_noisy_acc_y = meas_noisy_all.isolate_noise(id='acc_y')
-	meas_noisy_gyro = meas_noisy_all.isolate_noise(id='gyro')
+	meas_noisy_acc_x = meas_noisy_all.isolate_noise(sensor_id='acc_x')
+	meas_noisy_acc_y = meas_noisy_all.isolate_noise(sensor_id='acc_y')
+	meas_noisy_gyro = meas_noisy_all.isolate_noise(sensor_id='gyro')
 
 	# Instantiate the simulation cases of interest
 	case_reference = sc.SimulationCase(prefix='Reference', measurements=meas_nominal, reference=True)
@@ -33,7 +33,7 @@ def main():
 	[case.compute_trajectory(order=pm.ORDER) for case in cases]
 
 	# Plot trajectories (2D trajectory, states evolution in time, errors)
-	[case.plot_trajectory(verbose=False) for case in cases]
+	[case.plot_trajectory(verbose=True) for case in cases]
 
 
 if __name__ == '__main__':

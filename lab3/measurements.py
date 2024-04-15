@@ -50,8 +50,8 @@ class MeasurementCollection:
 		new_meas_collection = self.__copy__()
 		for sensor_id, measurement in new_meas_collection.measurements.items():
 			if sensor_id in ids:
-				nominal = new_meas_collection.measurements[id].nominal.copy()
-				new_meas_collection.measurements[id].noisy = nominal
+				nominal = new_meas_collection.measurements[sensor_id].nominal.copy()
+				new_meas_collection.measurements[sensor_id].noisy = nominal
 		return new_meas_collection
 
 	def isolate_noise(self, sensor_id):
