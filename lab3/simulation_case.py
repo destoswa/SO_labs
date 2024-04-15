@@ -10,12 +10,10 @@ class SimulationCase:
 		self.reference = reference
 		self.true_trajectory = tr.TrueTrajectory(measurements=self.measurements)
 		self.true_trajectory.compute_trajectory()
-		self.trajectory = None
+		self.trajectory = self.true_trajectory if reference else None
 
 	def compute_trajectory(self, order):
-		if self.reference:
-			self.trajectory = self.true_trajectory
-		else:
+		if not self.reference:
 			self.trajectory = tr.Trajectory(measurements=self.measurements)
 			self.trajectory.compute_trajectory(order=order)
 

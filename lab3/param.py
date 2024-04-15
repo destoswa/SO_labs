@@ -6,7 +6,7 @@ Define all params of Lab 3
 """
 # Simulation parameter
 SIMULATION_TIME = 200
-PLOTS_DIR = './data/'
+PLOTS_DIR = './data/lab3/'
 RANDOM_SEED = 42
 FREQ = 100
 ORDER = 2
@@ -61,13 +61,8 @@ def get_nominal_gyro(freq):
 # Sensor noise models
 GYRO_NOISE_MODELS = [
 	nm.Bias(bias_sd=150 * np.pi / 180 * 1 / 3600),  # bias_sd: rad/s
-
 	nm.GaussMarkov(psd_gm=7E-3 * np.pi / 180, tau=100),  # psd: rad/s/sqrt(Hz), tau: s
-	# SWANN 0.007 * np.pi / 180 * np.sqrt(FREQ) / (FREQ * SIMULATION_TIME)  # TODO Check values
-
-	nm.RandomWalk(psd_wn=1E-1 * np.pi / 180 * 1 / 60)  # psd: rad/s/sqrt(Hz)
-	# SWANN 0.1 * np.pi / 180 * np.sqrt(SIMULATION_TIME/3600) / (FREQ*SIMULATION_TIME) # TODO Check values
-
+	nm.RandomWalk(psd_wn=1E-1 * np.pi / 180 * 1/60)  # psd: rad/(s * sqrt(Hz))
 ]
 
 ACC_NOISE_MODELS = [

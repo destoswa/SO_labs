@@ -6,7 +6,7 @@ import numpy as np
 
 def main():
 	# Apply random seed for repeatability
-	np.random.seed(pm.RANDOM_SEED)
+	# np.random.seed(pm.RANDOM_SEED)
 
 	# Define the sensors with their noises models, and group them in a sensor collection for better manipulation
 	sensor_acc_x = sr.Sensor(sensor_id='acc_x', nominal_fct=pm.get_nominal_acc_x, noise_models=pm.ACC_NOISE_MODELS)

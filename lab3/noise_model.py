@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 
 
 class Bias:
@@ -7,7 +8,8 @@ class Bias:
 		self.bias_sd = bias_sd
 
 	def generate_noise(self, size, freq=None):
-		bias_noise = np.random.normal(size=size, scale=self.bias_sd)
+		bias = np.random.normal(scale=self.bias_sd)
+		bias_noise = np.ones(shape=size)*bias
 		return bias_noise
 
 
@@ -18,7 +20,7 @@ class WhiteNoise:
 
 	def generate_noise(self, size, freq):
 		sd = self.psd_wn * np.sqrt(freq)
-		wn_noise = sd * np.random.randn(size)
+		wn_noise = np.random.normal(size=size, scale=sd)
 		return wn_noise
 
 
@@ -41,11 +43,13 @@ class GaussMarkov:
 		self.beta = 1 / tau
 
 	def generate_noise(self, size, freq):
-		sd_wn = self.psd_gm * self.beta / 2  # TODO Check
-		psd_wn = sd_wn / np.sqrt(freq)  # TODO Check
+		dt = 1/freq
+		sd_gm = self.psd_gm/np.sqrt(freq)
+		sd_wn = np.sqrt(sd_gm*(1-np.exp(-2*self.beta*dt)))
+		psd_wn = sd_wn / np.sqrt(freq)
 		wn_noise = WhiteNoise(psd_wn=psd_wn).generate_noise(size=size, freq=freq)
 		gm_noise = np.zeros(size)
-		beta = 1 / self.tau
+		beta = self.beta
 		dt = 1 / freq
 		for i in range(1, size):
 			gm_noise[i] = gm_noise[i - 1] * np.exp(-beta * dt) + wn_noise[i - 1]
