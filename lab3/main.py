@@ -1,27 +1,29 @@
 import simulation_case as sc
-import measurements as ms
 import param as pm
-import noise_generator as ng
+import sensor as sr
+import numpy as np
 
 
 def main():
-	# Instantiate the noise generator for each sensor
-	noise_generators = {
-		'acc_x': ng.NoiseGenerator(pm.acc_specs),
-		'acc_y': ng.NoiseGenerator(pm.acc_specs),
-		'gyro': ng.NoiseGenerator(pm.gyro_specs)
-	}
+	# Apply random seed for repeatability
+	np.random.seed(pm.RANDOM_SEED)
 
-	# Create the (noisy) measurements, and copy the 3 sub measurements with only 1 noisy sensor
-	meas_nominal = ms.Measurements(freq=pm.FREQ)
-	meas_noisy_all = ms.Measurements(freq=pm.FREQ, noise_generators=noise_generators)
-	meas_noisy_acc_x = meas_noisy_all.select_noisy_sensor('acc_x')
-	meas_noisy_acc_y = meas_noisy_all.select_noisy_sensor('acc_y')
-	meas_noisy_gyro = meas_noisy_all.select_noisy_sensor('gyro')
+	# Define the sensors with their noises models, and group them in a sensor collection for better manipulation
+	sensor_acc_x = sr.Sensor(sensor_id='acc_x', nominal_fct=pm.get_nominal_acc_x, noise_models=pm.ACC_NOISE_MODELS)
+	sensor_acc_y = sr.Sensor(sensor_id='acc_y', nominal_fct=pm.get_nominal_acc_y, noise_models=pm.ACC_NOISE_MODELS)
+	sensor_gyro = sr.Sensor(sensor_id='gyro', nominal_fct=pm.get_nominal_gyro, noise_models=pm.GYRO_NOISE_MODELS)
+	sensor_collection = sr.SensorCollection(sensors=[sensor_acc_x, sensor_acc_y, sensor_gyro])
+
+	# Create the measurements
+	meas_noisy_all = sensor_collection.measure(pm.FREQ)
+	meas_nominal = meas_noisy_all.filter_noise()
+	meas_noisy_acc_x = meas_noisy_all.isolate_noise(id='acc_x')
+	meas_noisy_acc_y = meas_noisy_all.isolate_noise(id='acc_y')
+	meas_noisy_gyro = meas_noisy_all.isolate_noise(id='gyro')
 
 	# Instantiate the simulation cases of interest
-	case_reference = sc.SimulationCase(prefix='Reference', measurements=meas_nominal)
-	case_all_noise = sc.SimulationCase(prefix='Noisy all', measurements=meas_noisy_all)
+	case_reference = sc.SimulationCase(prefix='Reference', measurements=meas_nominal, reference=True)
+	case_all_noise = sc.SimulationCase(prefix='Noisy', measurements=meas_noisy_all)
 	case_noisy_acc_x = sc.SimulationCase(prefix='Noisy acc_x', measurements=meas_noisy_acc_x)
 	case_noisy_acc_y = sc.SimulationCase(prefix='Noisy acc_y', measurements=meas_noisy_acc_y)
 	case_noisy_gyro = sc.SimulationCase(prefix='Noisy gyro', measurements=meas_noisy_gyro)
@@ -31,35 +33,10 @@ def main():
 	[case.compute_trajectory(order=pm.ORDER) for case in cases]
 
 	# Plot trajectories (2D trajectory, states evolution in time, errors)
-	[case.plot_trajectory() for case in cases]
-
-
-def compare_order_and_freq():  # Lab2 new code
-	# Nominal measurements
-	meas_10 = ms.Measurements(freq=10)
-	meas_100 = ms.Measurements(freq=100)
-
-	# Simulation cases
-	case_reference = sc.SimulationCase(prefix='True_100', measurements=meas_100)
-	case_o1_10 = sc.SimulationCase(prefix='O1_10', measurements=meas_10)
-	case_o2_10 = sc.SimulationCase(prefix='O2_10', measurements=meas_10)
-	case_o1_100 = sc.SimulationCase(prefix='O1_100', measurements=meas_100)
-	case_o2_100 = sc.SimulationCase(prefix='O2_100', measurements=meas_100)
-
-	# Compute trajectories
-	case_o1_10.compute_trajectory(order=1)
-	case_o2_10.compute_trajectory(order=2)
-	case_o1_100.compute_trajectory(order=1)
-	case_o2_100.compute_trajectory(order=2)
-
-	# Plot
-	case_reference.plot_trajectory()
-	case_o1_10.plot_trajectory()
-	case_o2_10.plot_trajectory()
-	case_o1_100.plot_trajectory()
-	case_o2_100.plot_trajectory()
+	[case.plot_trajectory(verbose=False) for case in cases]
 
 
 if __name__ == '__main__':
 	main()
-	#compare_order_and_freq()  # Lab2
+
+

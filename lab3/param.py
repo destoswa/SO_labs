@@ -1,4 +1,5 @@
 import numpy as np
+import noise_model as nm
 
 """
 Define all params of Lab 3
@@ -23,24 +24,53 @@ OMEGA = np.pi / 100  # Radial_velocity
 # Initial conditions (KNOWN)
 INITIAL_CONDITIONS = {
 	'theta': 0,  # Angle between object and north axis
-	'azimuth': np.pi/2,  # Orientation of object w.r.t to north axis
+	'azimuth': np.pi / 2,  # Orientation of object w.r.t to north axis
 	'p_N': RADIUS,
 	'p_E': 0,
 	'v_N': 0,
-	'v_E': OMEGA*RADIUS
+	'v_E': OMEGA * RADIUS
 }
 
-# Sensor noise specs
-acc_specs = {
-	'B': {'bias': 1.3E-3 * ACC_GRAVITY},  # m/s²
-	'WN': {'sd_wn_psd': 57e-6 * ACC_GRAVITY * np.sqrt(FREQ)}  # m/s²/sample
-	#'WN': {'sd_wn_psd': 5.5917E-3}  # m/s²/sample
-}
 
-gyro_specs = {
-	'B': {'bias': 150 * np.pi / 180 / 3600},  # rad/s
-	'RW': {'sd_wn_psd': 0.1 * np.pi / 180 * np.sqrt(SIMULATION_TIME/3600) / (FREQ*SIMULATION_TIME)},  # rad/s/sample
-	'GM': {'sd_gm_psd': 0.007 * np.pi / 180 * np.sqrt(FREQ) / (FREQ * SIMULATION_TIME), 'tau': 100}  # resp. rad/s/sample and s
-	#'RW': {'sd_wn_psd': 9.259259E-5 * np.pi},  # rad/s/sample
-	#'GM': {'sd_gm_psd': 3.888888E-4 * np.pi, 'tau': 100}  # resp. rad/s/sample and s
-}
+# Time serie
+def get_time_serie(freq):
+	dt = 1 / freq
+	time = np.arange(0, SIMULATION_TIME + dt, dt)
+	return time
+
+
+# Nominal measurements
+def get_nominal_acc_x(freq):
+	time = get_time_serie(freq)
+	nominal_acc_x = np.full_like(a=time, fill_value=0)
+	return nominal_acc_x
+
+
+def get_nominal_acc_y(freq):
+	time = get_time_serie(freq)
+	nominal_acc_x = np.full_like(a=time, fill_value=OMEGA ** 2 * RADIUS)
+	return nominal_acc_x
+
+
+def get_nominal_gyro(freq):
+	time = get_time_serie(freq)
+	nominal_gyro = np.full_like(a=time, fill_value=OMEGA)
+	return nominal_gyro
+
+
+# Sensor noise models
+GYRO_NOISE_MODELS = [
+	nm.Bias(bias_sd=150 * np.pi / 180 * 1 / 3600),  # bias_sd: rad/s
+
+	nm.GaussMarkov(psd_gm=7E-3 * np.pi / 180, tau=100),  # psd: rad/s/sqrt(Hz), tau: s
+	# SWANN 0.007 * np.pi / 180 * np.sqrt(FREQ) / (FREQ * SIMULATION_TIME)  # TODO Check values
+
+	nm.RandomWalk(psd_wn=1E-1 * np.pi / 180 * 1 / 60)  # psd: rad/s/sqrt(Hz)
+	# SWANN 0.1 * np.pi / 180 * np.sqrt(SIMULATION_TIME/3600) / (FREQ*SIMULATION_TIME) # TODO Check values
+
+]
+
+ACC_NOISE_MODELS = [
+	nm.Bias(bias_sd=1.3E-3 * ACC_GRAVITY),  # bias_sd: m/s²
+	nm.WhiteNoise(psd_wn=57E-6 * ACC_GRAVITY)  # psd: m/s²/sqrt(Hz)
+]

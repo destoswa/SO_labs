@@ -1,0 +1,9 @@
+MAX ABSOLUTE ERROR - O2_100
+	- On azimuth 
+		 2.114E-12 [rad]
+	- On position
+		 P_E : 2.866E-05 [m]
+		 P_N : 1.645E-05 [m]
+	- On velocity
+		 V_E : 2.584E-07 [m/s]
+		 V_N : 1.292E-07 [m/s]

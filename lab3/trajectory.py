@@ -1,6 +1,6 @@
 import param
 import numpy as np
-from measurements import Measurements
+import measurements as ms
 
 
 class Trajectory:
@@ -22,7 +22,7 @@ class Trajectory:
 
 	def compute_trajectory(self, order):
 		# Shorter notation for measurements
-		dt = self.measurements.dt
+		dt = 1 / self.measurements.freq
 		acc_x = self.measurements['acc_x']
 		acc_y = self.measurements['acc_y']
 		gyro = self.measurements['gyro']
@@ -66,10 +66,9 @@ def integrate_numerically(dt, signal, initial_condition, order=1):
 
 
 class TrueTrajectory(Trajectory):
-	def __init__(self, measurements):
-		freq = measurements.freq
-		nominal_measurements = Measurements(freq)
-		super().__init__(measurements=nominal_measurements)  # Use nominal sensor values
+	def __init__(self, measurements: ms.MeasurementCollection):
+		self.measurements = measurements.filter_noise()
+		super().__init__(measurements=self.measurements)  # Use nominal sensor values
 
 	def compute_trajectory(self, order=None):
 		# Shorter notation for measurements

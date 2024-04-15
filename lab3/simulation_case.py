@@ -4,20 +4,22 @@ import param as pm
 
 
 class SimulationCase:
-	def __init__(self, prefix, measurements, ref=False):
+	def __init__(self, prefix, measurements, reference=False):
 		self.prefix = prefix
 		self.measurements = measurements
-		self.ref = ref
+		self.reference = reference
 		self.true_trajectory = tr.TrueTrajectory(measurements=self.measurements)
 		self.true_trajectory.compute_trajectory()
-		self.trajectory = self.true_trajectory if ref else None
+		self.trajectory = None
 
 	def compute_trajectory(self, order):
-		if not self.ref:
+		if self.reference:
+			self.trajectory = self.true_trajectory
+		else:
 			self.trajectory = tr.Trajectory(measurements=self.measurements)
 			self.trajectory.compute_trajectory(order=order)
 
-	def plot_trajectory(self, result_dir=pm.PLOTS_DIR, include_acc=False):
+	def plot_trajectory(self, result_dir=pm.PLOTS_DIR, include_acc=False, verbose=False):
 		"""
 		Create folder for plots
 		Create plots
@@ -27,6 +29,6 @@ class SimulationCase:
 			Print maximal errors for each state (for non-true case)
 		"""
 		sr.create_folders(prefix=self.prefix, result_dir=result_dir)
-		sr.show_error(result_dir=result_dir, simulation_case=self, add_acc=include_acc)
+		sr.show_error(result_dir=result_dir, simulation_case=self, add_acc=include_acc, verbose=verbose)
 		sr.show_evolution(result_dir=result_dir, simulation_case=self, add_acc=include_acc)
 		sr.show_trajectory(result_dir=result_dir, simulation_case=self)

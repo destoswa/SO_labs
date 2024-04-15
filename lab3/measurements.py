@@ -1,49 +1,61 @@
-import param
-import numpy as np
+import param as pm
 
 
-class Measurements:
-	def __init__(self, freq, noise_generators=None):
-		# Time
+class Measurement:
+	def __init__(self, sensor, freq, nominal, noisy):
+		self.sensor = sensor
 		self.freq = freq
-		self.dt = 1 / freq
-		self.time = np.arange(0, param.SIMULATION_TIME + self.dt, self.dt)
-		self.noise_generators = noise_generators
-
-		# Nominal values from sensors (Unknown, should not be accessed for integration)
-		self.nominal_sensors = {
-			'acc_x': np.full_like(a=self.time, fill_value=0),
-			'acc_y': np.full_like(a=self.time, fill_value=param.OMEGA ** 2 * param.RADIUS),
-			'gyro': np.full_like(a=self.time, fill_value=param.OMEGA)
-		}
-		self.sensors = self.nominal_sensors.copy()
-
-		# Noisy values from sensors
-		if self.is_noisy():
-			for sensor, signal in self.sensors.items():
-				if sensor in noise_generators.keys():
-					self.sensors[sensor] = noise_generators[sensor].add_noises(signal=signal, freq=self.freq)
-
-	def __len__(self):
-		return len(self.time)
+		self.nominal = nominal
+		self.noisy = noisy
+		self.time = pm.get_time_serie(freq)
 
 	def __getitem__(self, item):
-		return self.sensors[item]
+		return self.noisy[item]
 
 	def __copy__(self):
-		new_measurements = Measurements(self.freq)
-		new_measurements.noise_generators = self.noise_generators.copy()
-		new_measurements.sensors = self.sensors.copy()
-		return new_measurements
+		meas_copy = Measurement(
+			sensor=self.sensor,
+			freq=self.freq,
+			nominal=self.nominal.copy(),
+			noisy=self.noisy.copy()
+		)
+		return meas_copy
 
-	def select_noisy_sensor(self, noisy_sensor):
-		"""
-		Create a copy of the measurements, with only one the measurements being noisy
-		"""
-		new_measurements = self.__copy__()
-		new_measurements.sensors = self.nominal_sensors.copy()
-		new_measurements.sensors[noisy_sensor] = self.sensors[noisy_sensor]
-		return new_measurements
 
-	def is_noisy(self):
-		return self.noise_generators is not None
+class MeasurementCollection:
+	"""
+	Synchronic measurements
+	"""
+
+	def __init__(self, measurements):
+		self.measurements = measurements
+		_, measurement_0 = list(measurements.items())[0]
+		self.time = measurement_0.time.copy()  # Should be the same for all measurements
+		self.freq = measurement_0.freq         # Should be the same for all measurements
+
+	def __getitem__(self, sensor_id):
+		return self.measurements[sensor_id].noisy.copy()
+
+	def get_nominal(self, sensor_id):
+		return self.measurements[sensor_id].nominal.copy()
+
+	def __copy__(self):
+		measurements_copy = {}
+		for sensor_id, measurement in self.measurements.items():
+			measurements_copy[sensor_id] = measurement.__copy__()
+		return MeasurementCollection(measurements_copy)
+
+	def filter_noise(self, ids=None):
+		ids = self.measurements.keys() if ids is None else ids
+		new_meas_collection = self.__copy__()
+		for sensor_id, measurement in new_meas_collection.measurements.items():
+			if sensor_id in ids:
+				nominal = new_meas_collection.measurements[id].nominal.copy()
+				new_meas_collection.measurements[id].noisy = nominal
+		return new_meas_collection
+
+	def isolate_noise(self, sensor_id):
+		ids = list(self.measurements.keys())
+		ids.remove(sensor_id)
+		isolated_noise_meas_collection = self.filter_noise(ids=ids)
+		return isolated_noise_meas_collection

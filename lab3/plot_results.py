@@ -56,7 +56,7 @@ def max_abs_error(a, b):
 	return np.max(np.abs(a - b))
 
 
-def show_error(result_dir, simulation_case, add_acc=False):
+def show_error(result_dir, simulation_case, add_acc=False, verbose=False):
 	"""
 	Plot the difference between states of true_res (true states) and res (approximation of states)
 	states : orientation, position, velocity, OPTIONAL acceleration
@@ -73,31 +73,31 @@ def show_error(result_dir, simulation_case, add_acc=False):
 
 	# Subplot + titles
 	n_rows = 4 if add_acc else 3
-	fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(10, 8))
+	fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(10, 8), sharex='row')
 	fig.suptitle('Deviation from true trajectory (PVA)', fontsize=16)
-	axs[-1].set_xlabel(f'Time [{TIME_UNIT}]')
+	axs[n_rows - 1].set_xlabel(f'Time [{TIME_UNIT}]', size='large')
 
 	# Azimuth
 	axs[0].plot(time, trajectory.azimuth - true_trajectory.azimuth)
-	axs[0].set_ylabel(f'Azimuth [{ANGLE_UNIT}]', size='large')
+	axs[0].set_ylabel(f'Azimuth [{ANGLE_UNIT}]', rotation=90, size='large')
 
 	# Position
-	axs[1].plot(time, trajectory.p_E - true_trajectory.p_E, label='East')
 	axs[1].plot(time, trajectory.p_N - true_trajectory.p_N, label='North')
-	axs[1].set_ylabel(f'Position [{LENGTH_UNIT}]', size='large')
+	axs[1].plot(time, trajectory.p_E - true_trajectory.p_E, label='East')
+	axs[1].set_ylabel(f'Position [{LENGTH_UNIT}]', rotation=90, size='large')
 	axs[1].legend()
 
 	# Velocity
-	axs[2].plot(time, trajectory.v_E - true_trajectory.v_E, label='East')
 	axs[2].plot(time, trajectory.v_N - true_trajectory.v_N, label='North')
-	axs[2].set_ylabel(f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]', size='large')
+	axs[2].plot(time, trajectory.v_E - true_trajectory.v_E, label='East')
+	axs[2].set_ylabel(f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]', rotation=90, size='large')
 	axs[2].legend()
 
 	# Acceleration
 	if add_acc:
-		axs[3].plot(time, trajectory.acc_E - true_trajectory.acc_E, label='East')
 		axs[3].plot(time, trajectory.acc_N - true_trajectory.acc_N, label='North')
-		axs[3].set_ylabel(f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]', size='large')
+		axs[3].plot(time, trajectory.acc_E - true_trajectory.acc_E, label='East')
+		axs[3].set_ylabel(f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]', rotation=90, size='large')
 		axs[3].legend()
 
 	fig.align_ylabels()
@@ -134,7 +134,8 @@ def show_error(result_dir, simulation_case, add_acc=False):
 	max_error_report += "\n"
 
 	# Print and save the max error report
-	print(max_error_report)
+	if verbose:
+		print(max_error_report)
 	path = f'{result_dir}error_reports/max_error_report_{prefix}.txt'
 	with open(path, 'w') as f:
 		f.write(max_error_report)
@@ -155,15 +156,15 @@ def show_evolution(result_dir, simulation_case, add_acc=False):
 
 	# Subplot + titles
 	cols = ['Estimated', 'True']
-	rows = [f'Azimuth {ANGLE_UNIT}', f'Position {LENGTH_UNIT}', f'Velocity {LENGTH_UNIT}/{TIME_UNIT}']
+	rows = [f'Azimuth [{ANGLE_UNIT}]', f'Position [{LENGTH_UNIT}]', f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]']
 	if add_acc:
-		rows += f'Acceleration {LENGTH_UNIT}/{TIME_UNIT}²'
-	fig, axs = plt.subplots(nrows=len(rows), ncols=2, figsize=(10, 8))
+		rows += f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]'
+	fig, axs = plt.subplots(nrows=len(rows), ncols=2, figsize=(10, 8), sharey='row', sharex=True)
 
-	for ax in (axs[-1,0], axs[-1,1]):
-		ax.set_title(f'Time {TIME_UNIT}')
+	for ax in (axs[-1, 0], axs[-1, 1]):
+		ax.set_xlabel(f'Time {TIME_UNIT}', size='large')
 	for ax, row in zip(axs[:, 0], rows):
-		ax.set_ylabel(row, rotation=0, size='large')
+		ax.set_ylabel(row, rotation=90, size='large')
 	for ax, col in zip(axs[0], cols):
 		ax.set_title(col)
 
