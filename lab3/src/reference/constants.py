@@ -2,23 +2,23 @@ import numpy as np
 from lab3.src.sensor import NoiseModel as Nm
 
 # Simulation parameter
-SIMULATION_TIME = 200
 PLOTS_DIR = './data/lab3/'
 RANDOM_SEED = 42
+SIMULATION_TIME = 200
 FREQ = 100
 ORDER = 2
 
-# Convention : Units & constants
+# Convention : Units & common constants
 LENGTH_UNIT = 'm'
 TIME_UNIT = 's'
 ANGLE_UNIT = 'rad'
 ACC_GRAVITY = 9.81  # m²/s
 
-# Uniform circular motion parameters (UNKNOWN)
+# Uniform circular motion parameters (UNKNOWN for measurements and numerical integration)
 RADIUS = 500
 OMEGA = np.pi / 100  # Radial_velocity
 
-# Initial conditions (KNOWN)
+# Initial conditions (KNOWN for numerical integration)
 INITIAL_CONDITIONS = {
     'theta': 0,  # Angle between object and north axis
     'azimuth': np.pi / 2,  # Orientation of object w.r.t to north axis
@@ -27,9 +27,6 @@ INITIAL_CONDITIONS = {
     'v_N': 0,
     'v_E': OMEGA * RADIUS
 }
-
-# Time serie
-
 
 # Sensor noise models
 GYRO_NOISE_MODELS = [

@@ -1,6 +1,6 @@
 from lab3.src.navigation import Navigation as Nv
-from lab3.src.sensor import Sensor as Sr
-from lab3.src.nominal import constants as cst, nominal_fct as nf
+from lab3.src.sensor import Sensor as Sr, SensorSystem as SrS
+from lab3.src.reference import constants as cst, nominal_fct as nf
 import numpy as np
 
 
@@ -18,10 +18,10 @@ def main():
         Sr.Sensor(sensor_id='gyro', time_fct=time_fct, nominal_fct=nf.get_nominal_gyro,
                   noise_models=cst.GYRO_NOISE_MODELS)
     ]
-    sensor_collection = Sr.SensorCollection(sensors)
+    sensor_system = SrS.SensorSystem(sensors)
 
     # Create the collection of measurements for each case
-    meas_noisy_all = sensor_collection.measure(cst.FREQ)
+    meas_noisy_all = sensor_system.measure(cst.FREQ)
     meas_nominal = meas_noisy_all.filter_noise()
     meas_noisy_acc_x = meas_noisy_all.isolate_noise(sensor_id='acc_x')
     meas_noisy_acc_y = meas_noisy_all.isolate_noise(sensor_id='acc_y')

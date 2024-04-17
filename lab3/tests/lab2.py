@@ -1,6 +1,6 @@
 from lab3.src.navigation import Navigation as Nv
 from lab3.src.sensor import Sensor as Sr
-from lab3.src.nominal import constants as cst, nominal_fct as nf
+from lab3.src.reference import constants as cst, nominal_fct as nf
 
 
 # WIP

@@ -1,5 +1,5 @@
 import numpy as np
-from lab3.src.nominal import constants as cst
+from lab3.src.reference import constants as cst
 
 
 def get_time_serie(freq):

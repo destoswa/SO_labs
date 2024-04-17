@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from lab3.src.nominal.constants import TIME_UNIT, LENGTH_UNIT, ANGLE_UNIT
+from lab3.src.reference.constants import TIME_UNIT, LENGTH_UNIT, ANGLE_UNIT
 
 """
 Folders for plots

@@ -1,60 +1,3 @@
-
-
-class Measurement:
-    """
-    Represents a single measurement from a sensor.
-
-    Args:
-        sensor: The sensor object that generated the measurement.
-        freq (float): The frequency of the measurement.
-        time (ndarray): Time values of the measurement.
-        nominal (ndarray): Nominal measurement values.
-        noisy (ndarray): Noisy measurement values.
-
-    Methods:
-        __getitem__(item): Returns a subset of noisy measurement values.
-        __copy__(): Creates a copy of the measurement object.
-
-    """
-
-    def __init__(self, sensor, freq, time, nominal, noisy):
-        self.sensor = sensor
-        self.freq = freq
-        self.time = time
-        self.nominal = nominal
-        self.noisy = noisy
-
-    def __getitem__(self, item):
-        """
-        Returns a subset of noisy measurement values.
-
-        Args:
-            item: Index or slice object.
-
-        Returns:
-            ndarray: Subset of noisy measurement values.
-
-        """
-        return self.noisy[item]
-
-    def __copy__(self):
-        """
-        Creates a copy of the measurement object.
-
-        Returns:
-            Measurement: A copy of the measurement object.
-
-        """
-        meas_copy = Measurement(
-            sensor=self.sensor,
-            freq=self.freq,
-            time=self.time,
-            nominal=self.nominal.copy(),
-            noisy=self.noisy.copy()
-        )
-        return meas_copy
-
-
 class MeasurementCollection:
     """
     Represents a collection of synchronized measurements from multiple sensors.
@@ -64,7 +7,7 @@ class MeasurementCollection:
 
     Methods:
         __getitem__(sensor_id): Returns noisy measurements for a specific sensor.
-        get_nominal(sensor_id): Returns nominal measurements for a specific sensor.
+        get_nominal(sensor_id): Returns reference measurements for a specific sensor.
         __copy__(): Creates a copy of the measurement collection.
         filter_noise(ids): Removes noise from measurements for specified sensor IDs.
         isolate_noise(sensor_id): Removes noise from measurements for a specific sensor.
@@ -92,7 +35,7 @@ class MeasurementCollection:
 
     def get_nominal(self, sensor_id):
         """
-        Returns nominal measurements for a specific sensor.
+        Returns reference measurements for a specific sensor.
 
         Args:
             sensor_id: ID of the sensor.
@@ -131,8 +74,7 @@ class MeasurementCollection:
         new_meas_collection = self.__copy__()
         for sensor_id, measurement in new_meas_collection.measurements.items():
             if sensor_id in ids:
-                nominal = new_meas_collection.measurements[sensor_id].nominal.copy()
-                new_meas_collection.measurements[sensor_id].noisy = nominal
+                measurement.remove_noise(inplace=True)
         return new_meas_collection
 
     def isolate_noise(self, sensor_id):

@@ -1,5 +1,5 @@
-from lab3.src.nominal import constants as cst
-from lab3.src.navigation import Trajectory as Tr, navigation_plots as nvp
+from lab3.src.reference import constants as cst
+from lab3.src.navigation import Trajectory as Tr, TrueTrajectory as TTr, navigation_plots as nvp
 
 
 class Navigation:
@@ -17,7 +17,7 @@ class Navigation:
         self.initial_conditions = initial_conditions
         self.measurements = measurements
         self.reference = reference
-        self.true_trajectory = Tr.TrueTrajectory(initial_conditions=initial_conditions, measurements=measurements)
+        self.true_trajectory = TTr.TrueTrajectory(initial_conditions=initial_conditions, measurements=measurements)
         self.true_trajectory.compute_trajectory()
         self.trajectory = self.true_trajectory if reference else None
 
