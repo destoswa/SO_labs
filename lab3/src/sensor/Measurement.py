@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Measurement:
     """
     Represents a single measurement from a sensor.
@@ -63,3 +66,6 @@ class Measurement:
             noiseless_meas = self.__copy__()
             noiseless_meas.noisy = noiseless_meas.nominal.copy()
             return noiseless_meas
+
+    def is_noisy(self):
+        return not np.all(self.noisy == self.nominal)

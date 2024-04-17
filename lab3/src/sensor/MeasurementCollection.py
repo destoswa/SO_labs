@@ -92,3 +92,9 @@ class MeasurementCollection:
         ids.remove(sensor_id)
         isolated_noise_meas_collection = self.filter_noise(ids=ids)
         return isolated_noise_meas_collection
+
+    def is_noisy(self):
+        for _, measurement in self.measurements.items():
+            if measurement.is_noisy():
+                return True
+        return False

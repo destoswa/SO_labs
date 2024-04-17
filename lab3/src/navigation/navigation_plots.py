@@ -180,7 +180,7 @@ def show_evolution(result_dir, navigation, add_acc=False):
     rows = [f'Azimuth [{ANGLE_UNIT}]', f'Position [{LENGTH_UNIT}]', f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]']
     if add_acc:
         rows += f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]'
-    fig, axs = plt.subplots(nrows=len(rows), ncols=2, figsize=(10, 8), sharey='row', sharex=True)
+    fig, axs = plt.subplots(nrows=len(rows), ncols=2, figsize=(10, 8), sharey='row', sharex='all')
 
     for ax in (axs[-1, 0], axs[-1, 1]):
         ax.set_xlabel(f'Time {TIME_UNIT}', size='large')

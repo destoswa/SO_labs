@@ -17,9 +17,10 @@ class Navigation:
         self.initial_conditions = initial_conditions
         self.measurements = measurements
         self.reference = reference
-        self.true_trajectory = TTr.TrueTrajectory(initial_conditions=initial_conditions, measurements=measurements)
+        self.true_trajectory = TTr.TrueTrajectory(
+            initial_conditions=initial_conditions, measurements=measurements.filter_noise())
         self.true_trajectory.compute_trajectory()
-        self.trajectory = self.true_trajectory if reference else None
+        self.trajectory = self.true_trajectory.__copy__() if reference else None
 
     def compute_trajectory(self, order):
         """

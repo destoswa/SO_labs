@@ -1,9 +1,9 @@
 MAX ABSOLUTE ERROR - Noisy gyro
 	- On azimuth 
-		 3.245E+00 [rad]
+		 5.517E+00 [rad]
 	- On position
-		 P_E : 1.151E+03 [m]
-		 P_N : 9.614E+02 [m]
+		 P_E : 1.429E+03 [m]
+		 P_N : 9.194E+02 [m]
 	- On velocity
-		 V_E : 1.884E+01 [m/s]
-		 V_N : 2.272E+01 [m/s]
+		 V_E : 2.803E+01 [m/s]
+		 V_N : 2.679E+01 [m/s]

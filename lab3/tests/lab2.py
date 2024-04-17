@@ -1,5 +1,5 @@
 from lab3.src.navigation import Navigation as Nv
-from lab3.src.sensor import Sensor as Sr
+from lab3.src.sensor import SensorSystem as SrS, Sensor as Sr
 from lab3.src.reference import constants as cst, nominal_fct as nf
 
 
@@ -13,7 +13,7 @@ def compare_order_and_freq():  # Lab2 Adaptation to new code
         Sr.Sensor(sensor_id='acc_y', time_fct=time_fct, nominal_fct=nf.get_nominal_acc_y),
         Sr.Sensor(sensor_id='gyro', time_fct=time_fct, nominal_fct=nf.get_nominal_gyro)
     ]
-    sensor_collection = Sr.SensorCollection(sensors)
+    sensor_collection = SrS.SensorSystem(sensors)
 
     # Nominal measurements
     meas_10 = sensor_collection.measure(freq=10)

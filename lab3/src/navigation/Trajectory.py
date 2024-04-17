@@ -26,6 +26,18 @@ class Trajectory:
         self.p_E = None
         self.p_N = None
 
+    def __copy__(self):
+        new_traj = Trajectory(initial_conditions=self.initial_conditions.copy(), measurements=self.measurements.__copy__())
+        new_traj.theta = self.theta.copy()
+        new_traj.azimuth = self.azimuth.copy()
+        new_traj.acc_E = self.acc_E.copy()
+        new_traj.acc_N = self.acc_N.copy()
+        new_traj.v_E = self.v_E.copy()
+        new_traj.v_N = self.v_N.copy()
+        new_traj.p_E = self.p_E.copy()
+        new_traj.p_N = self.p_N.copy()
+        return new_traj
+
     def compute_trajectory(self, order):
         """
         Compute the trajectory.

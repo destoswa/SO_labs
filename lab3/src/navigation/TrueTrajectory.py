@@ -4,6 +4,10 @@ from lab3.src.navigation import Trajectory as Tr, integration as itg
 
 
 class TrueTrajectory(Tr.Trajectory):
+
+    def __copy__(self):
+        return super().__copy__()
+
     def compute_trajectory(self, order=None):
         """
         Compute the true trajectory.
