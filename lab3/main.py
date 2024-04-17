@@ -1,42 +1,48 @@
-import simulation_case as sc
-import param as pm
-import sensor as sr
+from lab3.src.navigation import Navigation as Nv
+from lab3.src.sensor import Sensor as Sr
+from lab3.src.nominal import constants as cst, nominal_fct as nf
 import numpy as np
 
 
 def main():
-	# Apply random seed for repeatability
-	# np.random.seed(pm.RANDOM_SEED)
+    # Apply random seed for repeatability
+    np.random.seed(cst.RANDOM_SEED)
 
-	# Define the sensors with their noises models, and group them in a sensor collection for better manipulation
-	sensor_acc_x = sr.Sensor(sensor_id='acc_x', nominal_fct=pm.get_nominal_acc_x, noise_models=pm.ACC_NOISE_MODELS)
-	sensor_acc_y = sr.Sensor(sensor_id='acc_y', nominal_fct=pm.get_nominal_acc_y, noise_models=pm.ACC_NOISE_MODELS)
-	sensor_gyro = sr.Sensor(sensor_id='gyro', nominal_fct=pm.get_nominal_gyro, noise_models=pm.GYRO_NOISE_MODELS)
-	sensor_collection = sr.SensorCollection(sensors=[sensor_acc_x, sensor_acc_y, sensor_gyro])
+    # Define the sensors with their noises models, and group them in a sensor collection for better manipulation
+    time_fct = nf.get_time_serie
+    sensors = [
+        Sr.Sensor(sensor_id='acc_x', time_fct=time_fct, nominal_fct=nf.get_nominal_acc_x,
+                  noise_models=cst.ACC_NOISE_MODELS),
+        Sr.Sensor(sensor_id='acc_y', time_fct=time_fct, nominal_fct=nf.get_nominal_acc_y,
+                  noise_models=cst.ACC_NOISE_MODELS),
+        Sr.Sensor(sensor_id='gyro', time_fct=time_fct, nominal_fct=nf.get_nominal_gyro,
+                  noise_models=cst.GYRO_NOISE_MODELS)
+    ]
+    sensor_collection = Sr.SensorCollection(sensors)
 
-	# Create the measurements
-	meas_noisy_all = sensor_collection.measure(pm.FREQ)
-	meas_nominal = meas_noisy_all.filter_noise()
-	meas_noisy_acc_x = meas_noisy_all.isolate_noise(sensor_id='acc_x')
-	meas_noisy_acc_y = meas_noisy_all.isolate_noise(sensor_id='acc_y')
-	meas_noisy_gyro = meas_noisy_all.isolate_noise(sensor_id='gyro')
+    # Create the collection of measurements for each case
+    meas_noisy_all = sensor_collection.measure(cst.FREQ)
+    meas_nominal = meas_noisy_all.filter_noise()
+    meas_noisy_acc_x = meas_noisy_all.isolate_noise(sensor_id='acc_x')
+    meas_noisy_acc_y = meas_noisy_all.isolate_noise(sensor_id='acc_y')
+    meas_noisy_gyro = meas_noisy_all.isolate_noise(sensor_id='gyro')
 
-	# Instantiate the simulation cases of interest
-	case_reference = sc.SimulationCase(prefix='Reference', measurements=meas_nominal, reference=True)
-	case_all_noise = sc.SimulationCase(prefix='Noisy', measurements=meas_noisy_all)
-	case_noisy_acc_x = sc.SimulationCase(prefix='Noisy acc_x', measurements=meas_noisy_acc_x)
-	case_noisy_acc_y = sc.SimulationCase(prefix='Noisy acc_y', measurements=meas_noisy_acc_y)
-	case_noisy_gyro = sc.SimulationCase(prefix='Noisy gyro', measurements=meas_noisy_gyro)
-	cases = [case_reference, case_all_noise, case_noisy_acc_x, case_noisy_acc_y, case_noisy_gyro]
+    # Instantiate the navigation cases
+    ic = cst.INITIAL_CONDITIONS
+    cases = [
+        Nv.Navigation(nav_id='Reference', initial_conditions=ic, measurements=meas_nominal, reference=True),
+        Nv.Navigation(nav_id='Noisy', initial_conditions=ic, measurements=meas_noisy_all),
+        Nv.Navigation(nav_id='Noisy acc_x', initial_conditions=ic, measurements=meas_noisy_acc_x),
+        Nv.Navigation(nav_id='Noisy acc_y', initial_conditions=ic, measurements=meas_noisy_acc_y),
+        Nv.Navigation(nav_id='Noisy gyro', initial_conditions=ic, measurements=meas_noisy_gyro)
+    ]
 
-	# Compute trajectories for each case
-	[case.compute_trajectory(order=pm.ORDER) for case in cases]
+    # Compute trajectories for each case
+    [case.compute_trajectory(order=cst.ORDER) for case in cases]
 
-	# Plot trajectories (2D trajectory, states evolution in time, errors)
-	[case.plot_trajectory(verbose=True) for case in cases]
+    # Plot trajectories (2D trajectory, states evolution in time, errors)
+    [case.plot_trajectory(verbose=True) for case in cases]
 
 
 if __name__ == '__main__':
-	main()
-
-
+    main()

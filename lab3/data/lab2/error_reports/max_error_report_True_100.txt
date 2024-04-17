@@ -1,9 +1,0 @@
-MAX ABSOLUTE ERROR - True_100
-	- On azimuth 
-		 0.000E+00 [rad]
-	- On position
-		 P_E : 0.000E+00 [m]
-		 P_N : 0.000E+00 [m]
-	- On velocity
-		 V_E : 0.000E+00 [m/s]
-		 V_N : 0.000E+00 [m/s]

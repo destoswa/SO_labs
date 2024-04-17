@@ -27,7 +27,7 @@ def allan_variance(x, dt=1, tau_min=None, tau_max=None,
                    n_clusters=100, input_type='mean'):
     """Compute Allan variance (AVAR).
 
-    Consider an underlying measurement y(t). Our sensors output integrals of
+    Consider an underlying sensor y(t). Our sensors output integrals of
     y(t) over successive time intervals of length dt. These measurements
     x(k * dt) form the input to this function.
 

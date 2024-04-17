@@ -13,7 +13,7 @@ def main():
 	case_100Hz_order1 = SimulationCase(freq=100, order=1)
 	case_100Hz_order2 = SimulationCase(freq=100, order=2)
 
-	# Integration of measurement to get estimation of orientation, position and velocity
+	# Integration of sensor to get estimation of orientation, position and velocity
 	case_10Hz_order1.integrate()
 	case_10Hz_order2.integrate()
 	case_100Hz_order1.integrate()
