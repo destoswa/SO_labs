@@ -32,7 +32,8 @@ INITIAL_CONDITIONS = {
 GYRO_NOISE_MODELS = [
     Nm.Bias(bias_sd=150 * np.pi / 180 * 1 / 3600),  # bias_sd: rad/s
     Nm.GaussMarkov(psd_gm=7E-3 * np.pi / 180, tau=100),  # psd: rad/s/sqrt(Hz), tau: s
-    Nm.RandomWalk(psd_wn=1E-1 * np.pi / 180 * 1 / 60)  # psd: rad/(s * sqrt(Hz))
+    #Nm.RandomWalk(psd_wn=1E-1 * np.pi / 180 / 60)  # psd: rad/(s * sqrt(Hz))
+    Nm.WhiteNoise(psd_wn=1E-1 * np.pi / 180 / 60)
 ]
 
 ACC_NOISE_MODELS = [

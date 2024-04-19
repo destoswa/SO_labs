@@ -6,7 +6,7 @@ import numpy as np
 
 def main():
     # Apply random seed for repeatability
-    np.random.seed(cst.RANDOM_SEED)
+    #np.random.seed(cst.RANDOM_SEED)
 
     # Define the sensors with their noises models, and group them in a sensor collection for better manipulation
     time_fct = nf.get_time_serie

@@ -50,6 +50,7 @@ class Bias(NoiseModel):
 
     def generate_noise(self, size, freq=None):
         bias = np.random.normal(scale=self.bias_sd)
+        print("Bias : " + str(bias))
         bias_noise = np.ones(shape=size) * bias
         return bias_noise
 
@@ -65,6 +66,7 @@ class WhiteNoise(NoiseModel):
 
     def generate_noise(self, size, freq):
         sd = self.psd_wn * np.sqrt(freq)
+        print("White noise - SD : " + str(sd))
         wn_noise = np.random.normal(size=size, scale=sd)
         return wn_noise
 
@@ -97,8 +99,9 @@ class GaussMarkov(NoiseModel):
 
     def generate_noise(self, size, freq):
         dt = 1 / freq
-        sd_gm = self.psd_gm / np.sqrt(freq)
-        sd_wn = np.sqrt(sd_gm * (1 - np.exp(-2 * self.beta * dt)))
+        sd_gm = self.psd_gm * np.sqrt(freq)
+        sd_wn = np.sqrt(sd_gm**2 * (1 - np.exp(-2 * self.beta * dt)))
+        print("Gauss markov - SD : " + str(sd_gm))
         psd_wn = sd_wn / np.sqrt(freq)
         wn_noise = WhiteNoise(psd_wn=psd_wn).generate_noise(size=size, freq=freq)
         gm_noise = np.zeros(size)
