@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from lab3.src.reference.constants import TIME_UNIT, LENGTH_UNIT, ANGLE_UNIT
+
 
 """
 Folders for plots
@@ -91,29 +91,29 @@ def show_error(result_dir, navigation, add_acc=False, verbose=False):
     n_rows = 4 if add_acc else 3
     fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(10, 8), sharex='row')
     fig.suptitle('Deviation from true trajectory (PVA)', fontsize=16)
-    axs[n_rows - 1].set_xlabel(f'Time [{TIME_UNIT}]', size='large')
+    axs[n_rows - 1].set_xlabel('Time [s]', size='large')
 
     # Azimuth
     axs[0].plot(time, trajectory.azimuth - true_trajectory.azimuth)
-    axs[0].set_ylabel(f'Azimuth [{ANGLE_UNIT}]', rotation=90, size='large')
+    axs[0].set_ylabel('Azimuth [rad]', rotation=90, size='large')
 
     # Position
     axs[1].plot(time, trajectory.p_N - true_trajectory.p_N, label='North')
     axs[1].plot(time, trajectory.p_E - true_trajectory.p_E, label='East')
-    axs[1].set_ylabel(f'Position [{LENGTH_UNIT}]', rotation=90, size='large')
+    axs[1].set_ylabel('Position [m]', rotation=90, size='large')
     axs[1].legend()
 
     # Velocity
     axs[2].plot(time, trajectory.v_N - true_trajectory.v_N, label='North')
     axs[2].plot(time, trajectory.v_E - true_trajectory.v_E, label='East')
-    axs[2].set_ylabel(f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]', rotation=90, size='large')
+    axs[2].set_ylabel('Velocity [m/s]', rotation=90, size='large')
     axs[2].legend()
 
     # Acceleration
     if add_acc:
         axs[3].plot(time, trajectory.acc_N - true_trajectory.acc_N, label='North')
         axs[3].plot(time, trajectory.acc_E - true_trajectory.acc_E, label='East')
-        axs[3].set_ylabel(f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]', rotation=90, size='large')
+        axs[3].set_ylabel('Acceleration [m/s²]', rotation=90, size='large')
         axs[3].legend()
 
     fig.align_ylabels()
@@ -131,22 +131,21 @@ def show_error(result_dir, navigation, add_acc=False, verbose=False):
 
     max_error_report = (f"MAX ABSOLUTE ERROR - {prefix}"
                         f"\n\t- On azimuth "
-                        f"\n\t\t {max_azimuth_error:.3E} [{ANGLE_UNIT}]"
+                        f"\n\t\t {max_azimuth_error:.3E} [rad]"
                         f"\n\t- On position"
-                        f"\n\t\t P_E : {max_p_E_error:.3E} [{LENGTH_UNIT}]"
-                        f"\n\t\t P_N : {max_p_N_error:.3E} [{LENGTH_UNIT}]"
+                        f"\n\t\t P_E : {max_p_E_error:.3E} [m]"
+                        f"\n\t\t P_N : {max_p_N_error:.3E} [m]"
                         f"\n\t- On velocity"
-                        f"\n\t\t V_E : {max_v_E_error:.3E} [{LENGTH_UNIT}/{TIME_UNIT}]"
-                        f"\n\t\t V_N : {max_v_N_error:.3E} [{LENGTH_UNIT}/{TIME_UNIT}]")
+                        f"\n\t\t V_E : {max_v_E_error:.3E} [m/s]"
+                        f"\n\t\t V_N : {max_v_N_error:.3E} [m/s]")
 
     if add_acc:
         max_acc_E_error = max_abs_error(true_trajectory.acc_E, trajectory.acc_E)
         max_acc_N_error = max_abs_error(true_trajectory.acc_N, trajectory.acc_N)
 
         max_error_report += (
-            f"\n\t- On acceleration"
-            f"\n\t\t A_E : {max_acc_E_error:.3E} [{LENGTH_UNIT}/{TIME_UNIT}²]"
-            f"\n\t\t A_N : {max_acc_N_error:.3E} [{LENGTH_UNIT}/{TIME_UNIT}²]")
+            f"\n\t- On acceleration \n\t\t A_E : {max_acc_E_error:.3E} [m/s²]"
+            f"\n\t\t A_N : {max_acc_N_error:.3E} [m/s²]")
     max_error_report += "\n"
 
     # Print and save the max error report
@@ -177,13 +176,13 @@ def show_evolution(result_dir, navigation, add_acc=False):
 
     # Subplot + titles
     cols = ['Estimated', 'True']
-    rows = [f'Azimuth [{ANGLE_UNIT}]', f'Position [{LENGTH_UNIT}]', f'Velocity [{LENGTH_UNIT}/{TIME_UNIT}]']
+    rows = ['Azimuth [rad]', 'Position [m]', 'Velocity [m/s]']
     if add_acc:
-        rows += f'Acceleration [{LENGTH_UNIT}/{TIME_UNIT}²]'
+        rows += 'Acceleration [m/s²]'
     fig, axs = plt.subplots(nrows=len(rows), ncols=2, figsize=(10, 8), sharey='row', sharex='all')
 
     for ax in (axs[-1, 0], axs[-1, 1]):
-        ax.set_xlabel(f'Time {TIME_UNIT}', size='large')
+        ax.set_xlabel('Time [s]', size='large')
     for ax, row in zip(axs[:, 0], rows):
         ax.set_ylabel(row, rotation=90, size='large')
     for ax, col in zip(axs[0], cols):

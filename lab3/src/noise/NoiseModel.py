@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
-import os
+
+import noise_utils as nu
+
 
 class NoiseModel(ABC):
     """
@@ -111,14 +113,3 @@ class GaussMarkov(NoiseModel):
         return gm_noise
 
 
-if __name__ == '__main__':
-
-    folder = '../../data/noises_tests/'
-    if not os.path.exists(folder):
-        os.mkdir(path=folder)
-
-    size = 200
-    Bias(bias_sd=1).plot_noise(size=size, n_serie=2, path=folder+'bias.jpg')
-    WhiteNoise(psd_wn=1).plot_noise(size=size, n_serie=2, path=folder+'WN.jpg')
-    RandomWalk(psd_wn=1).plot_noise(size=size, n_serie=2, path=folder+'RW.jpg')
-    GaussMarkov(psd_gm=1, tau=1).plot_noise(size=size, n_serie=2, path=folder+'GM.jpg')

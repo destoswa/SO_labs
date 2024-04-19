@@ -1,6 +1,6 @@
-from lab3.src.navigation import Navigation as Nv
-from lab3.src.sensor import Sensor as Sr, SensorSystem as SrS
-from lab3.src.reference import constants as cst, nominal_fct as nf
+from src.navigation import Navigation as Nv
+from src.sensor import Sensor as Sr, SensorSystem as SrS
+from src.reference import constants as cst, nominal_fct as nf
 import numpy as np
 
 
@@ -41,7 +41,7 @@ def main():
     [case.compute_trajectory(order=cst.ORDER) for case in cases]
 
     # Plot trajectories (2D trajectory, states evolution in time, errors)
-    [case.plot_trajectory(verbose=True) for case in cases]
+    [case.plot_trajectory(result_dir=cst.PLOTS_DIR, verbose=True) for case in cases]
 
 
 if __name__ == '__main__':
