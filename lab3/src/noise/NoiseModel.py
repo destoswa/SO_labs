@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 
+import noise_utils as nu
+
 
 class NoiseModel(ABC):
     """

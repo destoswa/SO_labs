@@ -1,5 +1,6 @@
-from lab3.src.reference import constants as cst
-from lab3.src.navigation import Trajectory as Tr, TrueTrajectory as TTr, navigation_plots as nvp
+import Trajectory as Tr
+import TrueTrajectory as TTr
+import navigation_plots as nvp
 
 
 class Navigation:
@@ -33,7 +34,7 @@ class Navigation:
             self.trajectory = Tr.Trajectory(initial_conditions=self.initial_conditions, measurements=self.measurements)
             self.trajectory.compute_trajectory(order=order)
 
-    def plot_trajectory(self, result_dir=cst.PLOTS_DIR, include_acc=False, verbose=False):
+    def plot_trajectory(self, result_dir, include_acc=False, verbose=False):
         """
         Create plots for trajectory and associated data.
 
