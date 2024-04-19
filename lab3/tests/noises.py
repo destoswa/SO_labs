@@ -4,7 +4,7 @@ from lab3.src.noise import NoiseModel as NsM
 
 if __name__ == '__main__':
 
-    folder = '../../data/noises_tests/'
+    folder = '../../data/noises/'
     if not os.path.exists(folder):
         os.mkdir(path=folder)
 
