@@ -244,8 +244,8 @@ def show_trajectory(result_dir, navigation):
     # Trajectory
     fig = plt.figure(figsize=(10, 10))
     plt.scatter(trajectory.p_E, trajectory.p_N, marker='.', alpha=0.8, linewidths=0.1)
-    plt.xlabel(f'East [{LENGTH_UNIT}]')
-    plt.ylabel(f'North [{LENGTH_UNIT}]')
+    plt.xlabel('East [m]')
+    plt.ylabel('North [m]')
     plt.title(f'Trajectory : {prefix}')
     plt.tight_layout()
     save_fig(fig, result_dir, prefix, plot_name=plot_name)
@@ -253,8 +253,8 @@ def show_trajectory(result_dir, navigation):
     # Zoom on trajectory
     fig = plt.figure(figsize=(10, 4))
     plt.scatter(trajectory.p_E, trajectory.p_N, marker='.', alpha=0.8, linewidths=0.1)
-    plt.xlabel(f'East [{LENGTH_UNIT}]')
-    plt.ylabel(f'North [{LENGTH_UNIT}]')
+    plt.xlabel('East [m]')
+    plt.ylabel('North [m]')
     plt.ylim([480, 520])
     plt.xlim([-100, 100])
     plt.tight_layout()

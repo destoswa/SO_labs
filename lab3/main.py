@@ -6,7 +6,7 @@ import numpy as np
 
 def main():
     # Apply random seed for repeatability
-    #np.random.seed(cst.RANDOM_SEED)
+    np.random.seed(cst.RANDOM_SEED)
 
     # Define the sensors with their noises models, and group them in a sensor collection for better manipulation
     time_fct = nf.get_time_serie
@@ -26,6 +26,7 @@ def main():
     meas_noisy_acc_x = meas_noisy_all.isolate_noise(sensor_id='acc_x')
     meas_noisy_acc_y = meas_noisy_all.isolate_noise(sensor_id='acc_y')
     meas_noisy_gyro = meas_noisy_all.isolate_noise(sensor_id='gyro')
+
 
     # Instantiate the navigation cases
     ic = cst.INITIAL_CONDITIONS

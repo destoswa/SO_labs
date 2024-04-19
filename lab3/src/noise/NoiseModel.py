@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 
-import noise_utils as nu
+from lab3.src.noise import noise_utils as nu
 
 
 class NoiseModel(ABC):
@@ -51,9 +51,8 @@ class Bias(NoiseModel):
         self.bias_sd = bias_sd
 
     def generate_noise(self, size, freq=None):
-        bias = np.random.normal(scale=self.bias_sd)
-        print("Bias : " + str(bias))
-        bias_noise = np.ones(shape=size) * bias
+        bias_noise = nu.bias(size=size, bias_sd=self.bias_sd)
+        # DEBUG print("Bias : " + str(bias_noise[0]))
         return bias_noise
 
 
@@ -68,8 +67,8 @@ class WhiteNoise(NoiseModel):
 
     def generate_noise(self, size, freq):
         sd = self.psd_wn * np.sqrt(freq)
-        print("White noise - SD : " + str(sd))
-        wn_noise = np.random.normal(size=size, scale=sd)
+        wn_noise = nu.white_noise(size, sd)
+        # DEBUG : print("White noise - SD : " + str(sd))
         return wn_noise
 
 
@@ -84,7 +83,7 @@ class RandomWalk(NoiseModel):
 
     def generate_noise(self, size, freq):
         wn_noise = self.wn.generate_noise(size, freq)
-        rw_noise = np.cumsum(wn_noise)
+        rw_noise = nu.random_walk(wn_noise)
         return rw_noise
 
 
@@ -97,19 +96,15 @@ class GaussMarkov(NoiseModel):
         super().__init__('Gauss-Markov')
         self.psd_gm = psd_gm
         self.tau = tau
-        self.beta = 1 / tau
+        self.beta = 1/tau
 
     def generate_noise(self, size, freq):
-        dt = 1 / freq
         sd_gm = self.psd_gm * np.sqrt(freq)
-        sd_wn = np.sqrt(sd_gm**2 * (1 - np.exp(-2 * self.beta * dt)))
-        print("Gauss markov - SD : " + str(sd_gm))
+        sd_wn = nu.sd_gm_to_sd_wn(sd_gm=sd_gm, beta=self.beta, dt=1/freq)
         psd_wn = sd_wn / np.sqrt(freq)
         wn_noise = WhiteNoise(psd_wn=psd_wn).generate_noise(size=size, freq=freq)
-        gm_noise = np.zeros(size)
-        beta = self.beta
-        for i in range(1, size):
-            gm_noise[i] = gm_noise[i - 1] * np.exp(-beta * dt) + wn_noise[i - 1]
+        gm_noise = nu.gauss_markov(wn=wn_noise, beta=self.beta, dt=1/freq)
+        # DEBUG : print("Gauss markov - SD : " + str(sd_gm))
         return gm_noise
 
 

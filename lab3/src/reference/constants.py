@@ -2,7 +2,7 @@ import numpy as np
 from lab3.src.noise import NoiseModel as Nm
 
 # Simulation parameter
-PLOTS_DIR = './data/lab3/'
+PLOTS_DIR = './data/'
 RANDOM_SEED = 42
 SIMULATION_TIME = 200
 FREQ = 100
@@ -32,8 +32,7 @@ INITIAL_CONDITIONS = {
 GYRO_NOISE_MODELS = [
     Nm.Bias(bias_sd=150 * np.pi / 180 * 1 / 3600),  # bias_sd: rad/s
     Nm.GaussMarkov(psd_gm=7E-3 * np.pi / 180, tau=100),  # psd: rad/s/sqrt(Hz), tau: s
-    #Nm.RandomWalk(psd_wn=1E-1 * np.pi / 180 / 60)  # psd: rad/(s * sqrt(Hz))
-    Nm.WhiteNoise(psd_wn=1E-1 * np.pi / 180 / 60)
+    Nm.WhiteNoise(psd_wn=1E-1 * np.pi / 180 / 60) # psd: rad/(s * sqrt(Hz))
 ]
 
 ACC_NOISE_MODELS = [
