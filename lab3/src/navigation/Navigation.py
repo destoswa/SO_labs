@@ -1,6 +1,8 @@
-import Trajectory as Tr
+"""import Trajectory as Tr
 import TrueTrajectory as TTr
-import navigation_plots as nvp
+import navigation_plots as nvp"""
+from lab3.src.reference import constants as cst
+from lab3.src.navigation import Trajectory as Tr, TrueTrajectory as TTr, navigation_plots as nvp
 
 
 class Navigation:
