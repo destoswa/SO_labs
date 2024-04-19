@@ -1,5 +1,5 @@
 import numpy as np
-from lab3.src.sensor import NoiseModel as Nm
+from lab3.src.noise import NoiseModel as Nm
 
 # Simulation parameter
 PLOTS_DIR = './data/lab3/'
