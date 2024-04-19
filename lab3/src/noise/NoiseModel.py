@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 
-from lab3.src.noise import allan_variance as av
-
 
 class NoiseModel(ABC):
     """
@@ -109,7 +107,4 @@ class GaussMarkov(NoiseModel):
             gm_noise[i] = gm_noise[i - 1] * np.exp(-beta * dt) + wn_noise[i - 1]
         return gm_noise
 
-        """
-        Check allan variances of noises
-        av.allan_variance(x=)
-        """
+
