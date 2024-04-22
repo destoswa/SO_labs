@@ -50,15 +50,17 @@ def main():
     # ================= Part II =================
     print("\n\n========== PART II ===========\n")
     s_norm_gyro = (df_gyro.g_N ** 2 + df_gyro.g_E ** 2 + df_gyro.g_D ** 2) ** 0.5
-    print("Gyro : Mean of norm serie", s_norm_gyro.mean())
-    print("Gyro : Std of norm serie", s_norm_gyro.std())
+    print(f"Gyro : reference {w_ref:.5E} [rad/s]")
+    print(f"Gyro : Mean of norm serie {s_norm_gyro.mean():.5E} [rad/s]")
+    print(f"Gyro : Std of norm serie, {s_norm_gyro.std():.5E} [rad/s]")
 
     # ==========================================
     # ================= Part III =================
     print("\n\n========== PART III ===========\n")
     s_norm_acc = (df_acc.a_N ** 2 + df_acc.a_E ** 2 + df_acc.a_D ** 2) ** 0.5
-    print("Acc: Mean of norm serie", s_norm_acc.mean())
-    print("Acc: Std of norm serie", s_norm_acc.std())
+    print(f"Acc : reference {g_ref:.5E} [m/s²]")
+    print(f"Acc: Mean of norm serie {- s_norm_acc.mean():.5E} [m/s²]")
+    print(f"Acc: Std of norm serie {s_norm_acc.std():.5E} [m/s²]")
 
     # ==========================================
     # ================= Part IV =================
@@ -101,6 +103,10 @@ def main():
     yaw = np.arctan2(-w_leveled[1], w_leveled[0])
     print(f'True yaw : {azimuth_ref:.5E} [rad]')
     print(f'Estimated yaw : {yaw:.5E} [rad]\n')
+
+    phi = np.arccos(w_z / s_norm_gyro.mean())
+    print(f'True latitude (phi) : {phi_ref:.5E} [rad]')
+    print(f'Estimated latitude (phi) : {phi:5E} [rad]\n')
 
 
 if __name__ == '__main__':
