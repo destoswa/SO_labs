@@ -16,9 +16,11 @@ azimuth_ref = 57.115  # TODO : Is it the yaw ? Assumed yes in the code
 roll_ref = roll_ref * np.pi / 180
 pitch_ref = - pitch_ref * np.pi / 180
 azimuth_ref = azimuth_ref * np.pi / 180
-phi_ref = phi_ref * np.pi/180
+phi_ref = phi_ref * np.pi / 180
+
 
 def main():
+    # Disable pandas warning
     pd.set_option('mode.chained_assignment', None)
 
     # ==========================================
