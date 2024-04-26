@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from src.readimu import readimu
+import matplotlib.pyplot as plt
 
 # Reference
 g_ref = -9.8055  # m/s²
@@ -50,7 +51,10 @@ def main():
     # ================= Part II =================
     print("\n\n========== PART II ===========\n")
     s_norm_gyro = (df_gyro.g_N ** 2 + df_gyro.g_E ** 2 + df_gyro.g_D ** 2) ** 0.5
+    list_s_norm_gyro = s_norm_gyro.sort_values().to_list()[0:int(len(s_norm_gyro)*.03)]
+    #s_norm_gyro.plot()
     print(f"Gyro : reference {w_ref:.5E} [rad/s]")
+    #print(f"Gyro : Mean of norm serie {np.mean(list_s_norm_gyro):.5E} [rad/s]")
     print(f"Gyro : Mean of norm serie {s_norm_gyro.mean():.5E} [rad/s]")
     print(f"Gyro : Std of norm serie, {s_norm_gyro.std():.5E} [rad/s]")
 
@@ -71,10 +75,10 @@ def main():
     roll_b_l = np.arctan2(-f_y, -f_z)
     pitch_b_l = np.arctan2(f_x, np.sqrt(f_y ** 2 + f_z ** 2))
 
-    print(f'True roll : {roll_ref:.5E} [rad]')
-    print(f'Estimated roll : {roll_b_l:.5E} [rad]\n')
-    print(f'True pitch : {pitch_ref:.5E} [rad]')
-    print(f'Estimated pitch : {pitch_b_l:.5E} [rad]')
+    print(f'True roll : {roll_ref*360/np.pi:.5E} [deg]')
+    print(f'Estimated roll : {roll_b_l*360/np.pi:.5E} [deg]\n')
+    print(f'True pitch : {pitch_ref*360/np.pi:.5E} [deg]')
+    print(f'Estimated pitch : {pitch_b_l*360/np.pi:.5E} [deg]')
 
     # ==========================================
     # ================= Part V =================
@@ -101,13 +105,14 @@ def main():
     )
     w_leveled = np.matmul(rot_leveled_b, w)
     yaw = np.arctan2(-w_leveled[1], w_leveled[0])
-    print(f'True yaw : {azimuth_ref:.5E} [rad]')
-    print(f'Estimated yaw : {yaw:.5E} [rad]\n')
+    print(f'True yaw : {azimuth_ref*360/np.pi:.5E} [deg]')
+    print(f'Estimated yaw : {yaw*360/np.pi:.5E} [deg]\n')
 
-    phi = np.arccos(w_z / s_norm_gyro.mean())
-    print(f'True latitude (phi) : {phi_ref:.5E} [rad]')
-    print(f'Estimated latitude (phi) : {phi:5E} [rad]\n')
+    phi = np.pi/2 - np.arccos(-w_z / w_ref)
+    print(f'True latitude (phi) : {phi_ref*360/np.pi:.5E} [deg]')
+    print(f'Estimated latitude (phi) : {phi*360/np.pi:5E} [deg]\n')
 
 
 if __name__ == '__main__':
     main()
+    plt.show()
