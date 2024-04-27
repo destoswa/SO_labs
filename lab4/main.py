@@ -58,6 +58,17 @@ def main():
     print(f"Gyro : Mean of norm serie {s_norm_gyro.mean():.5E} [rad/s]")
     print(f"Gyro : Std of norm serie, {s_norm_gyro.std():.5E} [rad/s]")
 
+    fig = plt.figure(figsize=(10, 4))
+    plt.semilogy(s_norm_gyro, alpha=.2, label='Measurements', color='blue', linewidth=.5)
+    plt.plot([s_norm_gyro.index[0], s_norm_gyro.index[-1]], [s_norm_gyro.mean(), s_norm_gyro.mean()], color='blue', linewidth=1.5, label="Mean of measurements")
+    plt.plot([s_norm_gyro.index[0], s_norm_gyro.index[-1]], [w_ref, w_ref], color='red', linewidth=1.5, label="Reference")
+    plt.ylabel('Norm of Gyro [rad/s]')
+    plt.xlabel('GPS - Time of week [s]')
+    plt.ylim([0, 3e-2])
+    plt.legend()
+    fig.savefig('result/norm_gyro.svg', format='svg')
+    fig.savefig('result/norm_gyro.png', format='png')
+
     # ==========================================
     # ================= Part III =================
     print("\n\n========== PART III ===========\n")
