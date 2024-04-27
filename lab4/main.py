@@ -3,6 +3,10 @@ import pandas as pd
 from src.readimu import readimu
 import matplotlib.pyplot as plt
 
+# Time period
+t_i = 482303
+t_f = 482358
+
 # Reference
 g_ref = -9.8055  # m/s²
 w_ref = 7.2921150E-5  # rad/s
@@ -13,7 +17,7 @@ roll_ref = 5.172
 pitch_ref = 3.269
 azimuth_ref = 57.115  # TODO : Is it the yaw ? Assumed yes in the code
 
-# ->(NED, rad)
+# Attitude ->(NED, rad)
 roll_ref = roll_ref * np.pi / 180
 pitch_ref = - pitch_ref * np.pi / 180
 azimuth_ref = azimuth_ref * np.pi / 180
@@ -34,7 +38,7 @@ def main():
     df_full_data = pd.DataFrame(full_data, columns=columns)
 
     # Select the data corresponding to the right time
-    df_data = df_full_data[df_full_data['Time'].between(482303, 482358)]
+    df_data = df_full_data[df_full_data['Time'].between(t_i, t_f)]
     df_acc = df_data[['Time', 'a_N', 'a_W', 'a_U']]
     df_gyro = df_data[['Time', 'g_N', 'g_W', 'g_U']]
     s_time = df_data.Time
@@ -50,39 +54,31 @@ def main():
     # ==========================================
     # ================= Part II =================
     print("\n\n========== PART II ===========\n")
-    s_norm_gyro = (df_gyro.g_N ** 2 + df_gyro.g_E ** 2 + df_gyro.g_D ** 2) ** 0.5
-    list_s_norm_gyro = s_norm_gyro.sort_values().to_list()[0:int(len(s_norm_gyro)*.03)]
-    #s_norm_gyro.plot()
-    print(f"Gyro : reference {w_ref:.5E} [rad/s]")
-    #print(f"Gyro : Mean of norm serie {np.mean(list_s_norm_gyro):.5E} [rad/s]")
-    print(f"Gyro : Mean of norm serie {s_norm_gyro.mean():.5E} [rad/s]")
-    print(f"Gyro : Std of norm serie, {s_norm_gyro.std():.5E} [rad/s]")
 
-    fig = plt.figure(figsize=(10, 4))
-    plt.semilogy(s_norm_gyro, alpha=.2, label='Measurements', color='blue', linewidth=.5)
-    plt.plot([s_norm_gyro.index[0], s_norm_gyro.index[-1]], [s_norm_gyro.mean(), s_norm_gyro.mean()], color='blue', linewidth=1.5, label="Mean of measurements")
-    plt.plot([s_norm_gyro.index[0], s_norm_gyro.index[-1]], [w_ref, w_ref], color='red', linewidth=1.5, label="Reference")
-    plt.ylabel('Norm of Gyro [rad/s]')
-    plt.xlabel('GPS - Time of week [s]')
-    plt.ylim([0, 3e-2])
-    plt.legend()
-    fig.savefig('result/norm_gyro.svg', format='svg')
-    fig.savefig('result/norm_gyro.png', format='png')
+    w_x = df_gyro.g_N.mean(axis=0)
+    w_y = df_gyro.g_E.mean(axis=0)
+    w_z = df_gyro.g_D.mean(axis=0)
+    w_norm = np.sqrt(w_x**2+w_y**2+w_z**2)
+    
+    print(f"Gyro : reference {w_ref:.5E} [rad/s]")
+    print(f"Gyro : norm of mean signals {w_norm:.5E} [rad/s]")
 
     # ==========================================
     # ================= Part III =================
     print("\n\n========== PART III ===========\n")
-    s_norm_acc = (df_acc.a_N ** 2 + df_acc.a_E ** 2 + df_acc.a_D ** 2) ** 0.5
+
+    f_x = df_acc.a_N.mean(axis=0)
+    f_y = df_acc.a_E.mean(axis=0)
+    f_z = df_acc.a_D.mean(axis=0)
+    f_norm = np.sqrt(f_x**2+f_y**2+f_z**2)
+
     print(f"Acc : reference {g_ref:.5E} [m/s²]")
-    print(f"Acc: Mean of norm serie {- s_norm_acc.mean():.5E} [m/s²]")
-    print(f"Acc: Std of norm serie {s_norm_acc.std():.5E} [m/s²]")
+    print(f"Acc : norm of mean signals {f_norm:.5E} [m/s²]")
 
     # ==========================================
     # ================= Part IV =================
     print("\n\n========== PART IV ===========\n")
-    f_x = df_acc.a_N.mean(axis=0)
-    f_y = df_acc.a_E.mean(axis=0)
-    f_z = df_acc.a_D.mean(axis=0)
+
     roll_b_l = np.arctan2(-f_y, -f_z)
     pitch_b_l = np.arctan2(f_x, np.sqrt(f_y ** 2 + f_z ** 2))
 
@@ -97,10 +93,6 @@ def main():
     roll_l_b = - roll_b_l
     pitch_l_b = - pitch_b_l
 
-    w_x = df_gyro.g_N.mean(axis=0)
-    w_y = df_gyro.g_E.mean(axis=0)
-    w_z = df_gyro.g_D.mean(axis=0)
-
     cos_p = np.cos(pitch_l_b)
     sin_p = np.sin(pitch_l_b)
     cos_r = np.cos(roll_l_b)
@@ -109,7 +101,7 @@ def main():
     w = np.array([w_x, w_y, w_z])
     rot_leveled_b = np.array(
         [
-            [cos_p, 0, -sin_p],
+            [cos_p, 0, -sin_p], 
             [sin_r * sin_p, cos_r, sin_r * cos_p],
             [cos_r * sin_p, -sin_r, cos_r * cos_p]
         ]
