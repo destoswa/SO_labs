@@ -25,3 +25,4 @@ LATITUDE = rad(46 + 31 / 60 + 17 / 3600)  # N46°31'17'' Latitude
 ROLL = rad(5.172)
 PITCH = rad(3.269)
 AZIMUTH = rad(57.115)
+
