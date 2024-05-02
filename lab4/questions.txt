@@ -1,0 +1,31 @@
+Frames
+- IMU != NWD ? --> If not, then we already know the orientation no ?
+
+Data
+- Why didn't you put the data in yaw instead of azimuth ? isn't the same thing ?
+
+Task 1
+    FACT : earth rotation amplitude is the same at any latitude,
+    only the orientation change. Then why did you precise,
+    earth rotation at EPFL latitude, when we compare only norms (amplitude)
+
+    Question 1:
+        Differences of norm at each given time t with (the norm of) w_ref?
+            Yes : we get differences of norm of order 1e3, is it expected ?
+            No : then what do you want exactly ?
+
+    Question 2:
+        Should we only use these differences to approximate the accuracy ?
+            - Can we use projection of measurements using attitude of reference ?
+
+Task 2
+    Same questions as above
+
+Task 3
+
+
+Task 4
+
+
+
+Task 5
