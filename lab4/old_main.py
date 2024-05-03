@@ -55,9 +55,9 @@ def main():
     # ================= Part II =================
     print("\n\n========== PART II ===========\n")
 
-    w_x = df_gyro.g_N.mean(axis=0)
-    w_y = df_gyro.g_E.mean(axis=0)
-    w_z = df_gyro.g_D.mean(axis=0)
+    w_x = df_gyro.g_N
+    w_y = df_gyro.g_E
+    w_z = df_gyro.g_D
     w_norm = np.sqrt(w_x**2+w_y**2+w_z**2)
     
     print(f"Gyro : reference {w_ref:.5E} [rad/s]")
