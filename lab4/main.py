@@ -1,155 +1,122 @@
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
-import src.constants as cst
-from src.constants import deg
-import src.readimu as rimu
-import src.show_results as sr
+from src.readimu import readimu
 
-""" NOTATION 
-Angular rate : w_a_b_c, angular rate of frame c relative to frame b expressed in frame a
-Rotation matrix : R_a_b, rotation from b to a, or attitude of b expressed in a
-    - angle of rotation matrix r_a_b, p_a_b, y_a_b for roll, pitch, yaw
-"""
+# Time period
+t_i = 482303
+t_f = 482358
 
-""" FRAMES
-Body frame : IMU (X', Y', Z') : 
-    - time : time serie in s
-    - gyros : angular rate of body relative to inertial frame in body frame w_b_i_b
-    - accs : specific forces applied to body in body frame : f_b
-    - must be converted  ->  (X, Y, Z) = (X, -Y', -Z')
+# Reference
+g_ref = -9.8055  # gravity acceleration m/s²
+w_ref = 7.2921150E-5  # mean earth rotation rad/s
+phi_ref = 46 + 31 / 60 + 17 / 3600  # N46°31'17'' Latitude
 
-Local frame : NWD 
-    - attitude of reference of body frame (with converted body frame XYZ), R_l_b
-    - must be converted to NED 
-"""
+# Reference attitude (NWD, deg)
+roll_ref = 5.172
+pitch_ref = 3.269
+azimuth_ref = 57.115  # TODO : Is it the yaw ? Assumed yes in the code
 
-""" ATTITUDE OF BODY FRAME IN LOCAL FRAME [rad] """
+# Attitude ->(NED, rad)
+roll_ref = roll_ref * np.pi / 180
+pitch_ref = - pitch_ref * np.pi / 180
+azimuth_ref = azimuth_ref * np.pi / 180
+phi_ref = phi_ref * np.pi / 180
 
-# Attitude of IMU in local frame (NWD)
-ROLL_REF_l_b = cst.ROLL
-PITCH_REF_l_b = cst.PITCH
-YAW_REF_l_b = cst.AZIMUTH  # TODO : Control, see questions
 
-# Change to local frame (NED)
-PITCH_REF_l_b = -PITCH_REF_l_b
+def main():
+    # Disable pandas warning
+    pd.set_option('mode.chained_assignment', None)
 
-""" TASK 1 : IMU Measurements [s, rad/s, m/s²] """
+    # ==========================================
+    # ================= Part I =================
+    print("========== PART I ===========\n")
 
-# Read IMU measurements in timespan of interest, in IMU frame
-time, gyro_x, gyro_y, gyro_z, acc_x, acc_y, acc_z = rimu.read_imu_timespan(cst.IMU_FILENAME, cst.T_0, cst.T_F)
+    # Read data (NWU)
+    columns = ['Time', 'g_N', 'g_W', 'g_U', 'a_N', 'a_W', 'a_U']
+    full_data = readimu('./data/0419_1553_PostProBinaryDecoded.imu', "IXSEA")
+    df_full_data = pd.DataFrame(full_data, columns=columns)
 
-# Change IMU frame (X', Y', Z') to (X' , -Y', -Z') the new (X, Y, Z) frame
-gyro_y, gyro_z, acc_y, acc_z = - gyro_y, - gyro_z, - acc_y, - acc_z
+    # Select the data corresponding to the right time
+    df_data = df_full_data[df_full_data['Time'].between(t_i, t_f)]
+    df_acc = df_data[['Time', 'a_N', 'a_W', 'a_U']]
+    df_gyro = df_data[['Time', 'g_N', 'g_W', 'g_U']]
+    s_time = df_data.Time
+    print("DATA :")
+    print(df_data.head())
 
-# Mean measurements
-gyro_x_m = np.mean(gyro_x)
-gyro_y_m = np.mean(gyro_y)
-gyro_z_m = np.mean(gyro_z)
-acc_x_m = np.mean(acc_x)
-acc_y_m = np.mean(acc_y)
-acc_z_m = np.mean(acc_z)
+    # Rotate from NWU to NED
+    df_acc['a_E'] = - df_acc['a_W']
+    df_acc['a_D'] = - df_acc['a_U']
+    df_gyro['g_E'] = - df_gyro['g_W']
+    df_gyro['g_D'] = - df_gyro['g_U']
 
-# Plot IMU and mean deviation
-sr.plot_IMU(time, gyro_x, gyro_y, gyro_z, acc_x, acc_y, acc_z)
-sr.plot_IMU_mean_dev(time, gyro_x, gyro_y, gyro_z, acc_x, acc_y, acc_z)
-sr.plot_IMU_mean_rel_dev(time, gyro_x, gyro_y, gyro_z, acc_x, acc_y, acc_z)
+    # ==========================================
+    # ================= Part II =================
+    print("\n\n========== PART II ===========\n")
 
-# Statistics
-print(" --- TASK 1 : IMU measurements ---  \n")
-sr.print_stats(gyro_x, gyro_y, gyro_z, acc_x, acc_y, acc_z)
+    w_x = df_gyro.g_N.mean()
+    w_y = df_gyro.g_E.mean()
+    w_z = df_gyro.g_D.mean()
+    w_norm = np.sqrt(w_x ** 2 + w_y ** 2 + w_z ** 2)
 
-""" TASK 2 : Gyro norms """
+    print(f"Gyro : reference {w_ref:.5E} [rad/s]")
+    print(f"Gyro : norm of mean signals {w_norm:.5E} [rad/s]")
 
-# Norm of average gyro signals (less noise), assume constant OK
-norm_avg_gyro = np.sqrt(gyro_x_m ** 2 + gyro_y_m ** 2 + gyro_z_m ** 2)
+    # ==========================================
+    # ================= Part III =================
+    print("\n\n========== PART III ===========\n")
 
-# (Avg) Norm of gyro signal at each time step (more sensitive to noise, especiallly bias)
-gyro_norms = np.sqrt(gyro_x ** 2 + gyro_y ** 2 + gyro_z ** 2)
-avg_gyro_norm = np.mean(gyro_norms)
+    f_x = df_acc.a_N.mean(axis=0)
+    f_y = df_acc.a_E.mean(axis=0)
+    f_z = df_acc.a_D.mean(axis=0)
+    f_norm = np.sqrt(f_x ** 2 + f_y ** 2 + f_z ** 2)
 
-# Reference earth rotation projection in body frame (XYZ)
-EARTH_ROTATION = cst.EARTH_ANGULAR_RATE
-"""
-earth_rotation_x = 
-earth_rotation_y = 
-earth_rotation_z =
-"""
+    print(f"Acc : reference {g_ref:.5E} [m/s²]")
+    print(f"Acc : norm of mean signals {f_norm:.5E} [m/s²]")
 
-# Comparison
-print(" --- TASK 2 --- \n")
-print(f"\tEarth rotation, norm : {deg(EARTH_ROTATION) * 1000:.5} [mdeg/s] ")
-print(f"\tAcc, avg norms  : {deg(avg_gyro_norm) * 1000:.5} [mdeg/s] ")
-print(f"\tAcc, norm avg : {deg(norm_avg_gyro) * 1000:.5} [mdeg/s] ")
-print("\n")
+    # ==========================================
+    # ================= Part IV =================
+    print("\n\n========== PART IV ===========\n")
 
-""" TASK 3 : Accs norms """
+    roll_b_l = np.arctan2(-f_y, -f_z)
+    pitch_b_l = np.arctan2(f_x, np.sqrt(f_y ** 2 + f_z ** 2))
 
-# Norm of average accs signals (less noise), assume constant OK
-norm_avg_acc = np.sqrt(acc_x_m ** 2 + acc_y_m ** 2 + acc_z_m ** 2)
+    print(f'True roll : {roll_ref * 180 / np.pi:.5E} [deg]')
+    print(f'Estimated roll : {roll_b_l * 180 / np.pi:.5E} [deg]\n')
+    print(f'True pitch : {pitch_ref * 180 / np.pi:.5E} [deg]')
+    print(f'Estimated pitch : {pitch_b_l * 180 / np.pi:.5E} [deg]')
 
-# (Avg) Norm of accs signal at each time step (more sensitive to noise, especiallly bias)
-acc_norms = np.sqrt(acc_x ** 2 + acc_y ** 2 + acc_z ** 2)
-avg_acc_norm = np.mean(acc_norms)
+    # ==========================================
+    # ================= Part V =================
+    print("\n\n========== PART V ===========\n")
+    roll_l_b = - roll_b_l
+    pitch_l_b = - pitch_b_l
 
-# Reference earth gravity specific force in body frame
-"""
-earth_gravity_x = 
-earth_gravity_y = 
-earth_gravity_z =
-"""
+    cos_p = np.cos(pitch_l_b)
+    sin_p = np.sin(pitch_l_b)
+    cos_r = np.cos(roll_l_b)
+    sin_r = np.sin(roll_l_b)
 
-# Comparison
-print(" --- TASK 3 --- \n")
-print(f"\tEarth gravity, norm : {abs(cst.EARTH_GRAVITY):.5} [m/s²]")
-print(f"\tAcc, avg norms  : {avg_acc_norm:.5} [m/s²] ")
-print(f"\tAcc, norm avg : {norm_avg_acc:.5} [m/s²] ")
-print("\n")
+    w = np.array([w_x, w_y, w_z])
+    rot_leveled_b = np.array(
+        [
+            [cos_p, 0, -sin_p],
+            [sin_r * sin_p, cos_r, sin_r * cos_p],
+            [cos_r * sin_p, -sin_r, cos_r * cos_p]
+        ]
+    )
+    w_leveled = np.matmul(rot_leveled_b, w)
+    yaw = np.arctan2(-w_leveled[1], w_leveled[0])
+    print(f'True yaw : {azimuth_ref * 180 / np.pi:.5E} [deg]')
+    print(f'Estimated yaw : {yaw * 180 / np.pi:.5E} [deg]\n')
 
-""" TASK 4 : Accelerometer leveling -> Roll, Pitch of body in local frame """
+    phi = np.pi / 2 - np.arccos(-w_z / w_ref)
+    print(f'True latitude (phi) : {phi_ref * 180 / np.pi:.5E} [deg]')
+    print(f'Estimated latitude (phi) : {phi * 180 / np.pi:5E} [deg]\n')
 
-# Accelerometer leveling
-roll_l_b = np.arctan2(-acc_y_m, -acc_z_m)
-pitch_l_b = np.arctan2(acc_x_m, np.sqrt(acc_y_m ** 2 + acc_z_m ** 2))
 
-# Comparison
-print(" --- TASK 4 --- \n")
-print(f'\tTrue roll : {deg(ROLL_REF_l_b):.5} [deg]')
-print(f'\tEstimated roll : {deg(roll_l_b):.5} [deg]\n')
-print(f'\tTrue pitch : {deg(PITCH_REF_l_b):.5} [deg]')
-print(f'\tEstimated pitch : {deg(pitch_l_b):.5} [deg]')
-print("\n")
-
-""" TASK 5 : Gyro-compassing -> yaw of body in local frame and transform the gyroscopic reading to the
-leveled frame"""
-
-# Gyro-compassing
-roll_b_l = - roll_l_b
-pitch_b_l = - pitch_l_b
-cos_p = np.cos(pitch_l_b)
-sin_p = np.sin(pitch_l_b)
-cos_r = np.cos(roll_l_b)
-sin_r = np.sin(roll_l_b)
-
-R_leveled_b = np.array(
-    [
-        [cos_p, 0, -sin_p],
-        [sin_r * sin_p, cos_r, sin_r * cos_p],
-        [cos_r * sin_p, -sin_r, cos_r * cos_p]
-    ]
-)
-
-gyro_b_m = np.array([gyro_x_m, gyro_y_m, gyro_z_m])
-gyro_leveled = np.matmul(R_leveled_b, gyro_b_m)
-yaw_b_l = np.arctan2(-gyro_leveled[1], gyro_leveled[0])
-
-# Latitude estimation
-phi = np.pi / 2 - np.arccos(- gyro_z_m / EARTH_ROTATION)
-
-# Comparison
-print(" --- TASK 5 --- \n")
-
-print(f'\tTrue yaw : {deg(YAW_REF_l_b):.5} [deg]')
-print(f'\tEstimated yaw : {deg(yaw_b_l):.5} [deg]\n')
-
-print(f'\tTrue latitude (phi) : {deg(cst.LATITUDE):.5} [deg]')
-print(f'\tEstimated latitude (phi) : {deg(phi):.5} [deg]\n')
+if __name__ == '__main__':
+    main()
+    plt.show()
