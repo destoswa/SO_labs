@@ -43,14 +43,18 @@ def main():
     df_acc = df_data[['Time', 'a_N', 'a_W', 'a_U']]
     df_gyro = df_data[['Time', 'g_N', 'g_W', 'g_U']]
     s_time = df_data.Time
-    print("DATA :")
-    print(df_data.head())
+    print("Acc :")
+    print(df_acc.describe(include="all"))
+
+    print("\nGyro :")
+    print(df_gyro.describe(include="all"))
 
     # Rotate from NWU to NED
     df_acc['a_E'] = - df_acc['a_W']
     df_acc['a_D'] = - df_acc['a_U']
     df_gyro['g_E'] = - df_gyro['g_W']
     df_gyro['g_D'] = - df_gyro['g_U']
+
 
     # ==========================================
     # ================= Part II =================
