@@ -120,6 +120,33 @@ def main():
     print(f'True latitude (phi) : {phi_ref * 180 / np.pi:.5E} [deg]')
     print(f'Estimated latitude (phi) : {phi * 180 / np.pi:5E} [deg]\n')
 
+    # gyro measurement analysis (for question 8)
+    s_norm_gyro = (df_gyro.g_N**2 + df_gyro.g_W**2 + df_gyro.g_D**2)**0.5
+
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8))
+    axs[0].semilogy(s_norm_gyro, alpha=.2, label='Measurements', color='blue', linewidth=.5)
+    axs[0].plot([s_norm_gyro.index[0], s_norm_gyro.index[-1]], [s_norm_gyro.mean(), s_norm_gyro.mean()], color='blue',
+             linewidth=1.5, label="Mean of measurements")
+    axs[0].plot([s_norm_gyro.index[0], s_norm_gyro.index[-1]], [w_ref, w_ref], color='red', linewidth=1.5,
+             label="Reference")
+    axs[0].set_ylabel('Norm of Gyro [rad/s]')
+    axs[0].set_xlabel('GPS - Time of week [s]')
+    axs[0].set_ylim([0, 3e-2])
+    axs[0].legend()
+    axs[0].set_title('Timeline of the Gyro\'s norm')
+
+    hist, bins = np.histogram(s_norm_gyro.to_numpy(), bins=100)
+    logbins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+    axs[1].hist(s_norm_gyro.to_numpy(),bins=logbins)
+    axs[1].set_xscale('log')
+    axs[1].axvline(x = w_ref, color='r', label='Reference', linewidth=2)
+    axs[1].legend()
+    axs[1].set_xlabel('Norm of Gyro [rad/s]')
+    axs[1].set_ylabel('Count [-]')
+    axs[1].set_title('Histogram')
+    fig.tight_layout()
+    fig.savefig('result/norm_gyro_timeline.svg', format='svg')
+    fig.savefig('result/norm_gyro_timeline.png', format='png')
 
 if __name__ == '__main__':
     main()
