@@ -10,6 +10,10 @@ class Noise():
     def generate(self):
         return False
 
+    def add_noise(self, signal):
+        self.generate()
+        return signal + self.signal
+
 
 class Bias(Noise):
     def __init__(self, freq, duration, bias_sd):
@@ -18,7 +22,7 @@ class Bias(Noise):
         self.generate()
 
     def generate(self):
-        self.signal = bias(int(self.duration/self.freq), self.bias_sd)
+        self.signal = bias(self.duration * self.freq, self.bias_sd)
 
 
 class WhiteNoise(Noise):
@@ -28,7 +32,7 @@ class WhiteNoise(Noise):
         self.generate()
 
     def generate(self):
-        self.signal = white_noise(int(self.duration/self.freq), self.sd)
+        self.signal = white_noise(self.duration * self.freq, self.sd)
 
 
 class RandomWalk(Noise):
@@ -38,7 +42,7 @@ class RandomWalk(Noise):
         self.generate()
 
     def generate(self):
-        wn = white_noise(int(self.duration/self.freq), self.sd)
+        wn = white_noise(self.duration * self.freq, self.sd)
         self.signal = random_walk(wn)
 
 
@@ -47,21 +51,20 @@ class GaussMarkov(Noise):
         Noise.__init__(self, freq, duration)
         self.sd_gm = sd_gm
         self.tau = tau
-        self.beta = 1/tau
+        self.beta = 1 / tau
         self.generate()
 
     def generate(self):
-        dt = 1/self.freq
+        dt = 1 / self.freq
         sd_wn = np.sqrt(self.sd_gm ** 2 * (1 - np.exp(-2 * self.beta * dt)))
-        wn = white_noise(int(self.duration/self.freq), sd_wn)
-        self.signal = gauss_markov(wn=wn, beta=self.beta, dt=1/self.freq)
+        wn = white_noise(self.duration * self.freq, sd_wn)
+        self.signal = gauss_markov(wn=wn, beta=self.beta, dt=1 / self.freq)
 
 
 # ==== Noise generation ====
 
 def bias(size, bias_sd):
     bias_ = np.random.normal(scale=bias_sd)
-    print("Bias : " + str(bias))
     bias_noise = np.ones(shape=size) * bias_
     return bias_noise
 
@@ -75,9 +78,10 @@ def random_walk(wn):
     rw = np.cumsum(wn, axis=1)
     return rw
 
+
 def gauss_markov(wn, beta, dt=1):
     size = len(wn)
     gm = np.zeros_like(wn)  # Assume gm[0] = 0
     for i in range(1, size):
-        gm[i] = gm[i - 1] * np.exp(-beta * dt) + wn[ i - 1]
+        gm[i] = gm[i - 1] * np.exp(-beta * dt) + wn[i - 1]
     return gm
