@@ -1,18 +1,16 @@
-from src.navigation import Navigation as Nv
-from src.sensor import Sensor as Sr, SensorSystem as SrS
-from src.kalman import Kalman
-from src.reference import constants as cst, nominal_fct as nf
+#from src.kalman import Kalman
+from src.Noise import Bias, WhiteNoise, RandomWalk, GaussMarkov
+import reference as ref
 import numpy as np
 
 
 def main():
     # Apply random seed for repeatability
-    np.random.seed(cst.RANDOM_SEED)
+    np.random.seed(42)
 
     # Define the sensor
-    time_fct = nf.get_time_serie
-    sensor = Sr.Sensor(sensor_id='gps_x', time_fct=time_fct, nominal_fct=nf.get_nominal_acc_x,
-                  noise_models=cst.ACC_NOISE_MODELS),
+    GPS_noise_x = Bias(freq=1, duration=ref.SIMULATION_TIME, bias_sd=0.5)
+    GPS_noise_y = Bias(freq=1, duration=ref.SIMULATION_TIME, bias_sd=0.5)
 
 
 if __name__ == '__main__':
