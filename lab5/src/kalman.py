@@ -7,8 +7,8 @@ class KalmanFilter:
 
     Assume constant phi,g,q,r
     """
-    def __init__(self, x0, p0, phi, q, h):
 
+    def __init__(self, x0, p0, phi, q, h):
         self.x_est = x0
         self.p_est = p0
         self.phi = phi
@@ -31,8 +31,12 @@ class KalmanFilter:
         self.covar_update()
 
     def gain(self, r):
-        p_pred, h, r = self.p_pred, self.h, self.r
-        self.k = np.linalg.solve(h @ p_pred @ h.T + r, p_pred @ h.t)
+        p_pred, h = self.p_pred, self.h
+        # self.k = p_pred @ h.T @ np.linalg.inv(h @ p_pred @ h.T + r)
+        A = (h @ p_pred @ h.T + r).T
+        b = (p_pred @ h.T).T
+        pass
+        self.k = np.linalg.solve(A, b).T
 
     def state_update(self, z):
         x_pred, k, h = self.x_pred, self.k, self.h
@@ -40,5 +44,5 @@ class KalmanFilter:
 
     def covar_update(self):
         k, h, p_pred = self.k, self.h, self.p_pred
-        i = np.identity(p_pred.shape)
+        i = np.eye(p_pred.shape[0])
         self.p_est = (i - k @ h) @ p_pred

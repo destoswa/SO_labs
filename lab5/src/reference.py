@@ -28,10 +28,10 @@ def generate_ref_states(freq=FREQ):
     vx = v * np.cos(theta)
     vy = v * np.sin(theta)
 
-    # a = OMEGA ** 2 * RADIUS
-    # ax = - a * np.sin(theta)
-    # ay = - a * np.cos(theta)
-    # states = np.array([x, y, vx, vy, ax, ay]).T
+    """    
+    a = OMEGA**2 * RADIUS
+    ax = - a * np.sin(theta)
+    ay = - a * np.cos(theta)"""
 
     states = np.array([x, y, vx, vy]).T
     return states
