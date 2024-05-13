@@ -1,8 +1,10 @@
 from src.kalman import KalmanFilter
 from src.Noise import WhiteNoise, white_noise
+from src.showing_results import show_trajectory
 from src import reference as ref
 import numpy as np
 import scipy as sp
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -39,8 +41,8 @@ def main():
         # Motion model
         dt = ref.DT
         f = np.array([  # dx/dt = f * x     [vx, vy, ax, ay] = f * [x ,y , vx , vy]
-            [0, 0, 1, 0],
-            [0, 0, 0, 1],
+            [0, 0, dt, 0],
+            [0, 0, 0, dt],
             [0, 0, 0, 0],
             [0, 0, 0, 0]
         ])
@@ -70,16 +72,41 @@ def main():
         r = np.eye(2) * sigma_gps**2
 
         # Kalman filter
-        kf = KalmanFilter(x0, p0, phi, q, h)
+        kf = KalmanFilter(x0, p0, phi, q, h, r)
+        kf_states = []
+        kf_states.append(kf.x_est)
         time_gps = list(time_gps)
-        for t in time:
+        for t in time[:-1]:
             kf.predict()
             # Condition to add gps measure to kf
             if t in time_gps:
                 ind = time_gps.index(t)
                 z = gps_states[ind]
-                kf.add_measure(z, r)
+                kf.update(z)
+            kf_states.append(kf.x_est)
+        kf_states = np.array(kf_states)
+
+        # Show trajectories
+        show_trajectory(kf_states, gps_states, f"kf_state_{real}", "results/trajectory", do_save_fig=True)
+
+        # STDs of error
+        # 4.a
+        diff_gps_ref = ref_states[::100, :2] - gps_states
+        std_real_gps = np.sqrt(np.std(diff_gps_ref[:, 0])**2 + np.std(diff_gps_ref[:, 1])**2)
+
+        # 4.b
+        diff_kf_ref = ref_states[:, :2] - kf_states[:, :2]
+        std_filtered = np.sqrt(np.std(diff_kf_ref[:, 0])**2 + np.std(diff_kf_ref[:, 1])**2)
+
+        # 4.c
+        # PAS COMPRIS!!
+
+        print(f"==== Realization {real} ====")
+        print(f"\tEmpirical std characterizing real GPS positioning quality: {std_real_gps}")
+        print(f"\tEmpirical std characterizing filtered positioning quality: {std_filtered}")
+        print(f"\tEmpirical std characterizing KF-predicted positioning quality (PAS COMPRIS!): {None}")
 
 
 if __name__ == '__main__':
     main()
+    #plt.show()
