@@ -17,14 +17,17 @@ class KalmanFilter:
         self.r = r
 
         self.k = None
-        #self.x_pred = None
-        #self.p_pred = None
+        self.x_pred = None
+        self.p_pred = None
 
     def predict(self):
         x_est, p_est, phi, q = self.x_est, self.p_est, self.phi, self.q
+        self.x_pred = phi @ x_est
+        self.p_pred = phi @ p_est @ phi.T + q
 
-        self.x_est = phi @ x_est
-        self.p_est = phi @ p_est @ phi.T + q
+    def no_meas_update(self):
+        self.x_est = self.x_pred
+        self.p_est = self.p_pred
 
     def update(self, z):
         self.gain()
@@ -32,24 +35,23 @@ class KalmanFilter:
         self.covar_update()
 
     def gain(self):
-        p_est, h, r = self.p_est, self.h, self.r
-        #self.k = p_est @ h.T @ np.linalg.inv(h @ p_est @ h.T + r)
-        A = (h @ p_est @ h.T + r).T
-        b = (p_est @ h.T).T
+        p_pred, h, r = self.p_pred, self.h, self.r
+        # self.k = p_est @ h.T @ np.linalg.inv(h @ p_est @ h.T + r)
+        A = (h @ p_pred @ h.T + r).T
+        b = (p_pred @ h.T).T
         self.k = np.linalg.solve(A, b).T
 
     def state_update(self, z):
-        x_est, k, h = self.x_est, self.k, self.h
+        x_pred, k, h = self.x_pred, self.k, self.h
 
         # === RESCALE MANUEL POUR TESTS ===
         #k[:2,:] = k[:2,:] * 0.5
         #k[2:,:] = k[2:,:] * 0.3
         # =================================
 
-        self.x_est = x_est + k @ (z - h @ x_est)
+        self.x_est = x_pred + k @ (z - h @ x_pred)
 
     def covar_update(self):
-        k, h, p_est = self.k, self.h, self.p_est
-        i = np.eye(p_est.shape[0])
-        self.p_est = (i - k @ h) @ p_est
-
+        k, h, p_pred = self.k, self.h, self.p_pred
+        i = np.eye(p_pred.shape[0])
+        self.p_est = (i - k @ h) @ p_pred
