@@ -1,6 +1,6 @@
 from src.kalman import KalmanFilter
 from src.Noise import WhiteNoise, white_noise
-from src.showing_results import show_trajectory
+from src.showing_results import show_trajectory, show_innovation, show_error
 from src import reference as ref
 import numpy as np
 import scipy as sp
@@ -94,7 +94,7 @@ def main():
         kf_covar_states = np.array(kf_covar_states)
 
         # Show trajectories
-        # show_trajectory(kf_states, gps_states, f"kf_state_{real}", "results/trajectory", do_save_fig=True)
+        #show_trajectory(kf_states, gps_states, f"kf_state_{real}", "results/trajectory", do_save_fig=True)
 
         # STDs of error
         # 4.a
@@ -112,14 +112,27 @@ def main():
         kf_predicted_positioning_quality = np.sqrt(p_var_x**2 + p_var_y**2)
         stabilized_value = np.mean(kf_predicted_positioning_quality[-10:])
 
-        fig = plt.figure(figsize=(10, 4))
-        plt.loglog(kf_predicted_positioning_quality)
-        fig.savefig(f"./results/kf_position_quality/{real}.jpg")
+        #fig = plt.figure(figsize=(10, 4))
+        #plt.loglog(kf_predicted_positioning_quality)
+        #fig.savefig(f"./results/kf_position_quality/{real}.jpg")
 
         print(f"==== Realization {real} ====")
         print(f"\tEmpirical std characterizing real GPS positioning quality: {std_real_gps}")
         print(f"\tEmpirical std characterizing filtered positioning quality: {std_filtered}")
         print(f"\tEmpirical std characterizing KF-predicted positioning quality : {stabilized_value}")
+
+        # Position and Velocity errors alongside 3-sigma bounds
+        sigma_pos = stabilized_value
+        p_var_vx = kf_covar_states[:, 2, 2]
+        p_var_vy = kf_covar_states[:, 3, 3]
+        kf_predicted_velocity_quality = np.sqrt(p_var_vx**2 + p_var_vy**2)
+        sigma_vel = np.mean(kf_predicted_velocity_quality[-10:])
+        show_error(kf_states, ref_states, sigma_pos, sigma_vel, ref.FREQ, real, 'results/errors', True)
+
+        # Innovation histogram
+        innovation_sequence = gps_states - kf_states[::int(ref.FREQ/ref.GPS_FREQ), :2]
+        show_innovation(innovation_sequence, real, 'results/innovation', True)
+
 
 
 if __name__ == '__main__':
