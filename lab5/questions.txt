@@ -1,1 +1,5 @@
 Incertitude acclélérations dans P0 aussi ?
+
+Table : process noise = xx, Frequency = YY ?
+
+Qeustion 2: Pourquoi 50 ? --> Swann
