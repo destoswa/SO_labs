@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 import numpy as np
 import os
 
@@ -47,26 +48,22 @@ def show_trajectory(kf_states, gps_states, prefix, src, do_save_fig=False):
 def show_error(kf_states, ref_states, sigma_pos, sigma_vel, freq,  prefix, src, do_save_fig=False):
 	diff = kf_states - ref_states
 	plt.rcParams.update({'font.size':14})
-	fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-	lw = 3
+	fig, axs = plt.subplots(4, 1, figsize=(10, 10), sharex=True)
+	lw = 1.5
 	ls = '--'
-	axs[0].scatter(diff[:, 0], diff[:, 1])
-	axs[0].axline((-3*sigma_pos,0),(-3*sigma_pos,0.1), linewidth=lw, linestyle=ls, color='r')
-	axs[0].axline((3*sigma_pos,0),(3*sigma_pos,0.1), linewidth=lw, linestyle=ls, color='r')
-	axs[0].axline((0, -3*sigma_pos),(0.1, -3*sigma_pos), linewidth=lw, linestyle=ls, color='r')
-	axs[0].axline((0, 3*sigma_pos),(0.1, 3*sigma_pos), linewidth=lw, linestyle=ls, color='r')
-	axs[0].set_title('Position error')
-	axs[0].set_ylabel('Northward [m]')
-	axs[0].set_xlabel('Eastward [m]')
-	axs[1].scatter(diff[:, 2], diff[:, 3])
-	axs[1].axline((-3*sigma_vel,0),(-3*sigma_vel,0.1), linewidth=lw, linestyle=ls, color='r')
-	axs[1].axline((3*sigma_vel,0),(3*sigma_vel,0.1), linewidth=lw, linestyle=ls, color='r')
-	axs[1].axline((0, -3*sigma_vel),(0.1, -3*sigma_vel), linewidth=lw, linestyle=ls, color='r')
-	axs[1].axline((0, 3*sigma_vel),(0.1, 3*sigma_vel), linewidth=lw, linestyle=ls, color='r')
-	axs[1].set_title('Velocity error')
-	axs[1].set_ylabel('Northward [m/s]')
-	axs[1].set_xlabel('Eastward [m/s]')
+	sigmas = [sigma_pos, sigma_pos, sigma_vel, sigma_vel]
+	y_labels = ['Pos N [m]', 'Pos E [m]', 'Vel N [m/s]', 'Vel E [m/s]', ]
 	fig.suptitle(f"Errors on positions and velocities at {freq}Hz")
+	for i in range(4):
+		axs[i].plot(range(len(diff[:, i])), diff[:, i])
+		axs[i].axline((0, -3 * sigmas[i]),(0.1, -3 * sigmas[i]), linewidth=lw, linestyle=ls, color='r')
+		axs[i].axline((0, 3 * sigmas[i]),(0.1, 3 * sigmas[i]), linewidth=lw, linestyle=ls, color='r')
+		axs[i].set_ylabel(y_labels[i])
+		ymax = max(max(diff[:, i]), 3*sigmas[i]) * 1.5
+		axs[i].set_ylim([-ymax, ymax])
+		axs[i].set_xlim([0, len(diff[:, i])])
+		axs[i].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+	axs[-1].set_xlabel("Timestamp [s]")
 	plt.tight_layout()
 	plt.rcParams.update({'font.size':10})
 	if do_save_fig:

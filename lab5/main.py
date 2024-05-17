@@ -62,7 +62,7 @@ def main():
         A = A * ref.DT
         B = sp.linalg.expm(A)
         phi = B[n:, n:].T
-        q = phi * B[:n, n:]
+        q = phi * B[:n, n:] * 0.1
 
         # Measurment model   z [2x1] = H[2X4] @ x[4x1] + v[2x1]
         h = np.array([
