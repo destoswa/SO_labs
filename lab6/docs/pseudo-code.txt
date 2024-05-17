@@ -69,17 +69,21 @@ Main()
 
     for t = (0, SIMULATION_TIME, dt)  # Assume all frequency syncronizable
         
-        # if IMU new values <--> time is multiple of dt_IMU (always the case)
+        if prev time iteration IMU new values <--> time-dt is multiple of dt_IMU (always the case)
         
             # Strapdown
-            state_pred[t] = strapdown(state_est[t], IMU[t])
+            state_pred[t] = strapdown(state_est[t-dt], IMU[t-dt])
         
-            if if GPS new values <--> time is multiple of dt_GPS
+            if GPS new values <--> time is multiple of dt_GPS
                 
                 # EKF
+                F,G,W = define_kalman_matrices(t) 
                 delta_z[t] = state_pred[t]('p_N' ,'p_E') - GPS[t] 
-                delta_state[t], delta_error[t] = EKF(state_est[t], delta_z[t], delta_error[t-dt])  # 
+                delta_state[t], delta_error[t] = EKF(F,G,W,state_est[t], delta_z[t], delta_error[t-dt_GPS])  # 
                 state_est[t+dt] = state_pred[t] + delta_state[t]
 
             else
                 state_est[t+dt] = state_pred[t] 
+
+        else
+            state_est[t+dt] = state_est[t]
