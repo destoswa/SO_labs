@@ -1,0 +1,85 @@
+
+# 1. Reference
+    # 1.0 Register all constants
+
+        # Simulation
+        simulation time
+
+        # Movement 
+        radius, omega
+        initial state
+
+        # Sensors IMU (gyro, accs)
+        freqs, noise_models
+
+        # GPS
+        freq, noise_models
+    
+    # 1.1 Create reference state (P,V,A) at IMU freq
+        use similar formula as in lab2
+
+    # 1.2 Create reference measurement (gyro, accs) at 
+        use similar formula as in lab2
+
+# 2. Measurement (Noise addition)
+
+    # 2.1 Forcing input (Sensors: gyro, accs)
+        # Generate noises for each sensor
+        # Meas = Ref meas + corresponging noise
+
+    # 2.2 GPS
+        # Generate noises for each sensor
+        # gps = Ref state + corresponging noise
+
+# 3. Strapdown (state prediction by integration)
+    # Convert sensor measurement to N,E frame
+    # Integration and initial state --> state prediction
+
+
+# 4. Extended Kalman Filter (use deltas)
+    
+    # Compute relevant input (deltas)
+    # Define constants matrices (F,G,Q)
+    # Apply Kalman Filter 
+
+
+Main()
+
+    # constants
+    SIMULATION_TIME = 200
+    SIM_FREQ = 100
+    IMU_FREQ = 100
+    GPS_FREQ = 0.5
+
+    # reference signals
+    ref_states = generate_ref_states(IMU_FREQ)  #  P,V,A
+    ref_states_GPS = generate_ref_states(GPS_FREQ)  #  P,V,A
+    ref_IMU = generate_ref_IMU(IMU_FREQ)  # gyro, accs   
+
+    # noisy_signals
+    IMU = ref_IMU + noise_IMU     # gyro, accs
+    GPS = ref_states_GPS + noise_GPS  # P
+
+    # main-loop (time-simulation)
+    dt = 1/SIM_FREQ
+    dt_IMU = 1/IMU_FREQ   
+    dt_GPS = 1/GPS_FREQ
+    
+    states_est[0] = ref_states[0]
+
+    for t = (0, SIMULATION_TIME, dt)  # Assume all frequency syncronizable
+        
+        # if IMU new values <--> time is multiple of dt_IMU (always the case)
+        
+            # Strapdown
+            state_pred[t] = strapdown(state_est[t], IMU[t])
+        
+            if if GPS new values <--> time is multiple of dt_GPS
+                
+                # EKF
+                delta_z[t] = state_pred[t]('p_N' ,'p_E') - GPS[t] 
+                delta_state[t], delta_error[t] = EKF(state_est[t], delta_z[t], delta_error[t-dt])  # 
+                state_est[t+dt] = state_pred[t] + delta_state[t]
+
+            else
+                state_est[t+dt] = state_pred[t] 
