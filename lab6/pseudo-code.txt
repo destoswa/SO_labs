@@ -1,0 +1,30 @@
+
+Main()
+
+    # Reference
+    ref_states = generate_ref_states(SIM_FREQ)  #  P,V,A
+    ref_IMU = generate_ref_IMU(SIM_FREQ)  # gyro, accs   
+
+    # Sensors
+    IMU = generate_IMU(ref_IMU, IMU_FREQ)     # gyro, accs
+    GPS = generate_GPS(ref_states, GPS_FREQ)  # P
+
+    # Initialization
+    F,G,W = define_kalman_matrices() 
+    states_est[0] = ref_states[0]
+
+    # Time loop
+    time = 1:SIMULATION_TIME:DT
+    for t in time
+        
+        # Strapdown
+        state_pred[t] = strapdown(state_est[t-dt], IMU[t-dt])
+        
+        # EKF with GPS
+        if GPS[t] valid
+            delta_z[t] = state_pred[t].P - GPS[t] 
+            delta_state[t], delta_error[t] = EKF(F,G,W,state_est[t], delta_z[t], delta_error[t-dt_GPS])
+            state_est[t+dt] = state_pred[t] + delta_state[t]
+        else
+            state_est[t+dt] = state_pred[t] 
+
