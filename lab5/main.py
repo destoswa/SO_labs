@@ -62,7 +62,7 @@ def main():
         A = A * ref.DT
         B = sp.linalg.expm(A)
         phi = B[n:, n:].T
-        q = phi * B[:n, n:] * 0.1
+        q = phi * B[:n, n:]
 
         # Measurment model   z [2x1] = H[2X4] @ x[4x1] + v[2x1]
         h = np.array([
@@ -109,7 +109,7 @@ def main():
         # 4.c
         p_var_x = kf_covar_states[:, 0, 0]
         p_var_y = kf_covar_states[:, 1, 1]
-        kf_predicted_positioning_quality = np.sqrt(p_var_x**2 + p_var_y**2)
+        kf_predicted_positioning_quality = np.sqrt(p_var_x + p_var_y)
         stabilized_value = np.mean(kf_predicted_positioning_quality[-10:])
 
         #fig = plt.figure(figsize=(10, 4))
@@ -132,7 +132,7 @@ def main():
         # Innovation histogram
         innovation_sequence = gps_states - kf_states[::int(ref.FREQ/ref.GPS_FREQ), :2]
         show_innovation(innovation_sequence, real, 'results/innovation', True)
-
+        #print(kf_covar_states)
 
 
 if __name__ == '__main__':
