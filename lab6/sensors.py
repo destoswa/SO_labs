@@ -10,9 +10,10 @@ SIGMA_GPS = 1
 
 def generate_gps(ref_states):
     
-    gps = np.full_like(ref_states[:, :2], None)
-    gps[::OFFSET] = ref_states[:, :2:OFFSET].copy()
-    n = gps[::OFFSET].shape(0)
+    gps = np.full_like(ref_states[:, 3::], None)
+    #gps[::OFFSET] = ref_states[:, :2:OFFSET].copy()
+    gps[::OFFSET] = ref_states[::OFFSET, 3::].copy()
+    n = gps[::OFFSET].shape[0]
 
     assert(n == 100)  # DEBUG
 
@@ -35,7 +36,7 @@ TAU_GYRO_GM = 30
 def generate_imu(ref_imu):
 
     imu = ref_imu.copy()
-    n = ref_imu.shape(0)
+    n = ref_imu.shape[0]
 
     # Acc X,Y
     imu[:, 0] += noise.white_noise(n, SIGMA_ACC_WN) + noise.gauss_markov(noise.white_noise(n, SIGMA_ACC_GM), 1/TAU_ACC_GM, 1/IMU_FREQ)
