@@ -1,6 +1,7 @@
 import numpy as np
 
 # Simulation parameter
+GRAVITY_CST = 9.81
 SIMULATION_TIME = 200
 SIMULATION_FREQ = 100
 DT = 1/SIMULATION_FREQ
@@ -16,7 +17,7 @@ def generate_states(time_sequence=TIME_SEQUENCE):
     theta = THETA_0 + OMEGA * time_sequence    
     
     states = np.zeros((len(time_sequence), 5))  # Alpha, V_N, V_E, P_N, P_E
-    states[:, 0] = ALPHA_0 + THETA_0
+    states[:, 0] = ALPHA_0 + theta
     states[:, 1] = - OMEGA * RADIUS * np.sin(theta)
     states[:, 2] = OMEGA * RADIUS * np.cos(theta)
     states[:, 3] = RADIUS * np.cos(theta)

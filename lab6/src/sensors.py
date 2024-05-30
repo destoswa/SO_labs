@@ -3,27 +3,25 @@ import numpy as np
 import reference as ref
 import noise
 
+
+""" GPS """
+
 GPS_FREQ = 0.5
 DT_GPS = int(1/GPS_FREQ)
 OFFSET = int(DT_GPS/ref.DT)
 SIGMA_GPS = 1
 
 def generate_gps(ref_states):
-    
-    gps = np.full_like(ref_states[:, 3::], None)
-    #gps[::OFFSET] = ref_states[:, :2:OFFSET].copy()
-    gps[::OFFSET] = ref_states[::OFFSET, 3::].copy()
+    gps = np.full_like(ref_states[:, 3:], None)
+    gps[::OFFSET] = ref_states[::OFFSET, 3:].copy()
     n = gps[::OFFSET].shape[0]
-
-    assert(n == 100)  # DEBUG
-
     gps[::OFFSET, 0] += noise.white_noise(n, SIGMA_GPS)
     gps[::OFFSET, 1] += noise.white_noise(n, SIGMA_GPS)
-    
     return gps
 
-IMU_FREQ = 100
+""" IMU """
 
+IMU_FREQ = 100
 SIGMA_ACC_WN = 50E-6 * np.sqrt(IMU_FREQ) 
 SIGMA_ACC_GM = 200E-6 * np.sqrt(IMU_FREQ) 
 TAU_ACC_GM = 60
