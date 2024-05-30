@@ -1,7 +1,7 @@
 import numpy as np
 
 # Simulation parameters
-NUMBER_REALIZATION = 5
+NUMBER_REALIZATION = 1
 SIMULATION_TIME = 200
 RADIUS = 25  # m
 OMEGA = np.pi / 100  # rad/s
@@ -26,7 +26,7 @@ def generate_ref_states(freq=FREQ):
 
     v = OMEGA * RADIUS
     vx = v * np.cos(theta)
-    vy = v * np.sin(theta)
+    vy = - v * np.sin(theta)
 
     """    
     a = OMEGA**2 * RADIUS

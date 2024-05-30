@@ -69,7 +69,6 @@ def show_error(kf_states, ref_states, sigma_pos, sigma_vel, freq,  prefix, src, 
 	if do_save_fig:
 		save_fig(fig, src, str(freq) + "Hz_" + str(prefix), plot_name='errors')
 
-
 def show_innovation(seq, prefix, src, do_save_fig=False):
 	plt.rcParams.update({'font.size':14})
 	fig,axs = plt.subplots(1,2, figsize=(12,6))
@@ -87,3 +86,32 @@ def show_innovation(seq, prefix, src, do_save_fig=False):
 		save_fig(fig, src, prefix, plot_name='innovation')
 
 	plt.rcParams.update({'font.size':10})
+
+
+
+"""        # Error plot
+        sigmas = [sigma_pos, sigma_pos, sigma_vel, sigma_vel]
+
+        diff = kf_states - ref_states
+
+        plt.rcParams.update({'font.size':14})
+        fig, axs = plt.subplots(4, 1, figsize=(10, 10), sharex=True)
+        y_labels = ['Pos N [m]', 'Pos E [m]', 'Vel N [m/s]', 'Vel E [m/s]', ]
+        fig.suptitle(f"Errors on positions and velocities at {ref.FREQ}Hz")
+
+        lw = 1.5
+        ls = '--'
+        c = 'r'
+        for i, ax in enumerate(axs):
+            ax.axline((0, -3 * sigmas[i]),(0.1, -3 * sigmas[i]), linewidth=lw, linestyle=ls, color=c)
+            ax.axline((0, 3 * sigmas[i]),(0.1, 3 * sigmas[i]), linewidth=lw, linestyle=ls, color=c)
+            ax.set_ylabel(y_labels[i])
+            ax.plot(diff[:, i])
+            ymax = max(max(diff[:, i]), 3*sigmas[i]) * 1.5
+            ax.set_ylim([-ymax, ymax])
+            ax.set_xlim([0, len(diff[:, i])])
+        axs[-1].set_xlabel("Timestamp [s]")
+        plt.tight_layout()
+        plt.rcParams.update({'font.size':10})
+        fig.savefig(f"results/{ref.FREQ}Hz_{real}_errors.jpg")
+"""

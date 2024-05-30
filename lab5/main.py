@@ -11,14 +11,14 @@ def main():
     # Apply random seed for repeatability
     np.random.seed(42)
 
-    # Reference position
+    # Reference (Position and velocities in N-E frame)
     ref_states = ref.generate_ref_states()
 
     # Generate realizations
     time = ref.generate_time_serie()
     for real in range(ref.NUMBER_REALIZATION):
 
-        # Gps = ref + noise    on x and y
+        # Gps = ref + noise 
         time_gps = ref.generate_time_serie(freq=ref.GPS_FREQ)
         gps_states = ref.generate_ref_states(freq=ref.GPS_FREQ)[:, :2]
         size = ref.GPS_FREQ * ref.SIMULATION_TIME
@@ -62,7 +62,7 @@ def main():
         A = A * ref.DT
         B = sp.linalg.expm(A)
         phi = B[n:, n:].T
-        q = phi * B[:n, n:]
+        q = phi @ B[:n, n:]
 
         # Measurment model   z [2x1] = H[2X4] @ x[4x1] + v[2x1]
         h = np.array([
@@ -74,10 +74,13 @@ def main():
 
         # Kalman filter
         kf = KalmanFilter(x0, p0, phi, q, h, r)
+        
         kf_states = []
         kf_covar_states = []
+        
         kf_states.append(kf.x_est)
         kf_covar_states.append(kf.p_est)
+        
         time_gps = list(time_gps)
         for t in time[1:]:  # The initial position is not corrected, start at time[1]
             kf.predict()
@@ -97,13 +100,14 @@ def main():
         #show_trajectory(kf_states, gps_states, f"kf_state_{real}", "results/trajectory", do_save_fig=True)
 
         # STDs of error
+        
         # 4.a
         ratio_freq = ref.FREQ//ref.GPS_FREQ
-        diff_gps_ref = ref_states[::ratio_freq, :2] - gps_states
+        diff_gps_ref = gps_states - ref_states[::ratio_freq, :2] 
         std_real_gps = np.sqrt(np.std(diff_gps_ref[:, 0])**2 + np.std(diff_gps_ref[:, 1])**2)
 
         # 4.b
-        diff_kf_ref = ref_states[:, :2] - kf_states[:, :2]
+        diff_kf_ref = kf_states[:, :2] - ref_states[:, :2]
         std_filtered = np.sqrt(np.std(diff_kf_ref[:, 0])**2 + np.std(diff_kf_ref[:, 1])**2)
 
         # 4.c
@@ -120,20 +124,24 @@ def main():
         print(f"\tEmpirical std characterizing real GPS positioning quality: {std_real_gps}")
         print(f"\tEmpirical std characterizing filtered positioning quality: {std_filtered}")
         print(f"\tEmpirical std characterizing KF-predicted positioning quality : {stabilized_value}")
-
+        
+  
         # Position and Velocity errors alongside 3-sigma bounds
         sigma_pos = stabilized_value
         p_var_vx = kf_covar_states[:, 2, 2]
         p_var_vy = kf_covar_states[:, 3, 3]
-        kf_predicted_velocity_quality = np.sqrt(p_var_vx**2 + p_var_vy**2)
+        kf_predicted_velocity_quality = np.sqrt(p_var_vx + p_var_vy)
         sigma_vel = np.mean(kf_predicted_velocity_quality[-10:])
+        
         show_error(kf_states, ref_states, sigma_pos, sigma_vel, ref.FREQ, real, 'results/errors', True)
+
+
 
         # Innovation histogram
         innovation_sequence = gps_states - kf_states[::int(ref.FREQ/ref.GPS_FREQ), :2]
         show_innovation(innovation_sequence, real, 'results/innovation', True)
         #print(kf_covar_states)
-
+        
 
 if __name__ == '__main__':
     main()
