@@ -6,6 +6,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
+tunnel_prefix = "_tunnel" if ref.INCLUDE_TUNNEL else ""
 
 def main():
     # Apply random seed for repeatability
@@ -86,7 +87,7 @@ def main():
         for t in time[1:]:  # The initial position is not corrected, start at time[1]
             kf.predict()
             # Condition to add gps measure to kf
-            if t in time_gps and (t<ref.TUNNEL_TIME_START or t>= ref.TUNNEL_TIME_STOP):
+            if t in time_gps and (t<ref.TUNNEL_TIME_START or t>= ref.TUNNEL_TIME_STOP or ref.INCLUDE_TUNNEL == False):
                 ind = time_gps.index(t)
                 z = gps_states[ind]
                 kf.update(z)
@@ -98,7 +99,7 @@ def main():
         kf_covar_states = np.array(kf_covar_states)
 
         # Show trajectories
-        show_trajectory(kf_states, gps_states, f"kf_state_{real}", "lab5/results/trajectory", do_save_fig=True)
+        show_trajectory(kf_states, gps_states, f"kf_state_{real}{tunnel_prefix}", ref.FREQ, "results/trajectory", do_save_fig=True)
 
         # Errors and standard deviations
         # 4.a
@@ -131,11 +132,11 @@ def main():
         p_var_vy = kf_covar_states[:, 3, 3]
         kf_predicted_velocity_quality = np.sqrt(p_var_vx + p_var_vy)
         sigma_vel = np.mean(kf_predicted_velocity_quality[-10:])        
-        show_error(kf_states, ref_states, sigma_pos, sigma_vel, ref.FREQ, real, 'lab5/results/errors', True)
+        show_error(kf_states, ref_states, kf_covar_states, ref.FREQ, f"{real}{tunnel_prefix}", 'results/errors', True)
 
         # Innovation histogram
         innovation_sequence = gps_states - kf_states[::int(ref.FREQ/ref.GPS_FREQ), :2]
-        show_innovation(innovation_sequence, real, 'lab5/results/innovation', True)
+        show_innovation(innovation_sequence, f"{real}{tunnel_prefix}", ref.FREQ, 'results/innovation', True)
         
 
 if __name__ == '__main__':

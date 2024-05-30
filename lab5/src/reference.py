@@ -5,11 +5,12 @@ NUMBER_REALIZATION = 5
 SIMULATION_TIME = 200
 RADIUS = 25  # m
 OMEGA = np.pi / 100  # rad/s
-FREQ = 1   # freq IMU and simulation
+FREQ = 100   # freq IMU and simulation
 DT = 1/FREQ
 GPS_FREQ = 1
 
 # Tunnel
+INCLUDE_TUNNEL = False
 TUNNEL_THETA_START = 90
 TUNNEL_THETA_STOP = 135
 TUNNEL_THETA_START = TUNNEL_THETA_START  * np.pi/180
