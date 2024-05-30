@@ -14,29 +14,15 @@ We also assume the frequency are easily syncronisable
 --> all the timestamp of the gps are included in the timestamp of the imu
 """
 
-
 def main():
 
     """ Reference """ 
     ref_states = ref.generate_states()  # attitude, v_N, v_E, p_N, p_E, gyro_bias, gyro_noise, acc_x_noise, acc_y_noise
     ref_imu = ref.generate_imu()        # acc_x, acc_x, gyro
 
-    plt.clf()
-    plt.plot(ref_states[:, 4], ref_states[:, 3])
-    plt.savefig("lab6/results/reference.jpg")
-
-    plt.clf()
-    plt.plot(ref_imu[:, 4], ref_imu[:, 3])
-    plt.savefig("lab6/results/reference.jpg")
-
-
-
     """ Sensors """ 
     gps = sen.generate_gps(ref_states)  # None when no measurement
     imu = sen.generate_imu(ref_imu)
-    
-    plt.plot(gps[::200,1], gps[::200, 0])
-    plt.savefig("lab6/results/gps.jpg")
 
     """ Initialize X, dX and P matrices, see 6.4, 6.5 """
     T, N = ref_states.shape
@@ -72,12 +58,12 @@ def main():
         
         # Attitude : a[t] = a[t-1] * w[t-1] * dt
         attitude_prev = X[t-1, 0]
-        gyro = -imu[t-1, 2]
+        gyro = imu[t-1, 2]
         attitude_next = attitude_prev + gyro * ref.DT
 
         # IMU to NE frame
         R_bm = np.array([[np.cos(attitude_prev), -np.sin(attitude_prev)],
-                    [np.sin(attitude_prev), np.cos(attitude_prev)]])
+                    [np.sin(attitude_prev), np.cos(attitude_prev)]]).T
         accs_m = R_bm @ imu[t-1,:2].T
         
         # Velocity : v[t] = v[t-1] + a[t-1] * dt
@@ -139,13 +125,13 @@ def main():
         Q = phi @ B[:dN, dN:]
 
         # Predict dX
-        dX[t] = phi @ dX[t]   # Trivial == 0, No ???
+        dX[t] = phi @ np.zeros((9)) #dX[t+1]   # Trivial == 0, No ???
         P[t] = phi @ P[t-1] @ phi.T + Q
 
         # Update with dZ (GPS - State X)
-        if not np.isnan(gps[t,0]):
-            
-            dZ = gps[t] - X[t, 4:6]
+        if False:#not np.isnan(gps[t,0]):
+            print(dZ)
+            dZ = gps[t].copy() - X[t, 3:5].copy()
 
             # Gain K
             # TODO Avoid inversion with solving instead
@@ -163,6 +149,13 @@ def main():
         """ Apply correction """
         X[t] += dX[t, :5]
 
+
+    sr.fig_ref_traj(ref_states)
+    sr.fig_ref_imu(ref_imu)
+    sr.fig_gps(gps)
+    sr.fig_imu(imu)
+    sr.fig_traj(X, ref_states, gps)
+    
 
 if __name__ == "__main__":
     main()
