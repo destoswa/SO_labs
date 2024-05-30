@@ -12,15 +12,16 @@ def main():
     np.random.seed(42)
 
     # Reference (Position and velocities in N-E frame)
-    ref_states = ref.generate_ref_states()
+    ref_states = ref.generate_ref_states(ref.FREQ)
 
     # Generate realizations
-    time = ref.generate_time_serie()
+    time = ref.generate_time_serie(ref.FREQ)
     for real in range(ref.NUMBER_REALIZATION):
 
         # Gps = ref + noise 
         time_gps = ref.generate_time_serie(freq=ref.GPS_FREQ)
         gps_states = ref.generate_ref_states(freq=ref.GPS_FREQ)[:, :2]
+        gps_ref_states = gps_states.copy()
         size = ref.GPS_FREQ * ref.SIMULATION_TIME
         gps_states[:, 0] = gps_states[:, 0] + white_noise(size, sd=0.5)  # x
         gps_states[:, 1] = gps_states[:, 1] + white_noise(size, sd=0.5)  # y
@@ -85,7 +86,7 @@ def main():
         for t in time[1:]:  # The initial position is not corrected, start at time[1]
             kf.predict()
             # Condition to add gps measure to kf
-            if t in time_gps:
+            if t in time_gps and (t<ref.TUNNEL_TIME_START or t>= ref.TUNNEL_TIME_STOP):
                 ind = time_gps.index(t)
                 z = gps_states[ind]
                 kf.update(z)
@@ -97,13 +98,11 @@ def main():
         kf_covar_states = np.array(kf_covar_states)
 
         # Show trajectories
-        #show_trajectory(kf_states, gps_states, f"kf_state_{real}", "results/trajectory", do_save_fig=True)
+        show_trajectory(kf_states, gps_states, f"kf_state_{real}", "lab5/results/trajectory", do_save_fig=True)
 
-        # STDs of error
-        
+        # Errors and standard deviations
         # 4.a
-        ratio_freq = ref.FREQ//ref.GPS_FREQ
-        diff_gps_ref = gps_states - ref_states[::ratio_freq, :2] 
+        diff_gps_ref = gps_states - gps_ref_states
         std_real_gps = np.sqrt(np.std(diff_gps_ref[:, 0])**2 + np.std(diff_gps_ref[:, 1])**2)
 
         # 4.b
@@ -131,16 +130,12 @@ def main():
         p_var_vx = kf_covar_states[:, 2, 2]
         p_var_vy = kf_covar_states[:, 3, 3]
         kf_predicted_velocity_quality = np.sqrt(p_var_vx + p_var_vy)
-        sigma_vel = np.mean(kf_predicted_velocity_quality[-10:])
-        
-        show_error(kf_states, ref_states, sigma_pos, sigma_vel, ref.FREQ, real, 'results/errors', True)
-
-
+        sigma_vel = np.mean(kf_predicted_velocity_quality[-10:])        
+        show_error(kf_states, ref_states, sigma_pos, sigma_vel, ref.FREQ, real, 'lab5/results/errors', True)
 
         # Innovation histogram
         innovation_sequence = gps_states - kf_states[::int(ref.FREQ/ref.GPS_FREQ), :2]
-        show_innovation(innovation_sequence, real, 'results/innovation', True)
-        #print(kf_covar_states)
+        show_innovation(innovation_sequence, real, 'lab5/results/innovation', True)
         
 
 if __name__ == '__main__':

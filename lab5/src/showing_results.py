@@ -9,12 +9,11 @@ Folders for plots
 TIME_UNIT = 's'
 LENGTH_UNIT = 'm'
 ANGLE_UNIT = 'rad'
-EXTENSIONS = ['jpg', 'svg']
+EXTENSIONS = ['jpg'] #, 'svg']
 
 """
 Plots
 """
-
 
 def save_fig(fig, src, prefix, plot_name, extensions=None):
 	"""
@@ -35,7 +34,7 @@ def show_trajectory(kf_states, gps_states, prefix, src, do_save_fig=False):
 	plt.rcParams.update({'font.size': 22})
 	fig = plt.figure(figsize=(10, 10))
 	plt.scatter(kf_states[:, 0], kf_states[:, 1], label='estimated trajectory', marker='.', alpha=0.8, linewidths=0.1)
-	plt.scatter(gps_states[:, 0], gps_states[:, 1], label='estimated trajectory', marker='x', color='r', linewidths=1.5)
+	#plt.scatter(gps_states[:, 0], gps_states[:, 1], label='estimated trajectory', marker='x', color='r', linewidths=1.5)
 	plt.xlabel(f'E axis [m]')
 	plt.ylabel(f'N axis [m]')
 	plt.title(f'Trajectory : {prefix}')
