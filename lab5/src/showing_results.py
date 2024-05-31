@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 import numpy as np
+import src.reference as ref
 import os
 
 """
@@ -9,7 +10,7 @@ Folders for plots
 TIME_UNIT = 's'
 LENGTH_UNIT = 'm'
 ANGLE_UNIT = 'rad'
-EXTENSIONS = ['jpg'] #, 'svg']
+EXTENSIONS = ['svg']
 
 """
 Plots
@@ -45,25 +46,30 @@ def show_trajectory(kf_states, gps_states, prefix, freq, src, do_save_fig=False)
 	plt.rcParams.update({'font.size': 10})
 
 
-def show_error(kf_states, ref_states, kf_covar_states, freq,  prefix, src, do_save_fig=False):
+def show_error(kf_states, ref_states, kf_covar_states, freq, gps_freq,  prefix, src, do_save_fig=False):
 	diff = kf_states - ref_states
 	plt.rcParams.update({'font.size':14})
 	fig, axs = plt.subplots(4, 1, figsize=(10, 10), sharex=True)
 	lw = 1.5
 	ls = '--'
 	#sigmas = [kf_covar_states[:,], sigma_pos, sigma_vel, sigma_vel]
+	sigma_pos = np.sqrt(kf_covar_states[:,0,0] + kf_covar_states[:,1,1])
+	sigma_vel = np.sqrt(kf_covar_states[:,2,2] + kf_covar_states[:,3,3])
+	sigmas = [sigma_pos,sigma_pos,sigma_vel,sigma_vel]
 	y_labels = ['Pos N [m]', 'Pos E [m]', 'Vel N [m/s]', 'Vel E [m/s]', ]
 	fig.suptitle(f"Errors on positions and velocities at {freq}Hz")
 	for i in range(4):
-		axs[i].plot(range(len(diff[:, i])), diff[:, i])
+		axs[i].plot(ref.generate_time_serie(freq), diff[:, i])
 		#axs[i].axline((0, -3 * sigmas[i]),(0.1, -3 * sigmas[i]), linewidth=lw, linestyle=ls, color='r')
 		#axs[i].axline((0, 3 * sigmas[i]),(0.1, 3 * sigmas[i]), linewidth=lw, linestyle=ls, color='r')
-		axs[i].plot(range(len(diff[:, i])), 3 * np.sqrt(kf_covar_states[:, i, i]), linewidth=lw, linestyle=ls, color='r' )
-		axs[i].plot(range(len(diff[:, i])), -3 * np.sqrt(kf_covar_states[:, i, i]), linewidth=lw, linestyle=ls, color='r' )
+		axs[i].plot(ref.generate_time_serie(gps_freq), 3 * np.sqrt(kf_covar_states[::int(freq/gps_freq), i, i]), linewidth=lw, linestyle=ls, color='r' )
+		axs[i].plot(ref.generate_time_serie(gps_freq), -3 * np.sqrt(kf_covar_states[::int(freq/gps_freq), i, i]), linewidth=lw, linestyle=ls, color='r' )
+		#axs[i].plot(range(len(diff[:, i])), 3 * sigmas[i], linewidth=lw, linestyle=ls, color='r' )
+		#axs[i].plot(range(len(diff[:, i])), -3 * sigmas[i], linewidth=lw, linestyle=ls, color='r' )
 		axs[i].set_ylabel(y_labels[i])
 		ymax = np.max(np.quantile(3*np.sqrt(kf_covar_states[:, i, i]), 0.9)) * 1.5
 		axs[i].set_ylim([-ymax, ymax])
-		axs[i].set_xlim([0, len(diff[:, i])])
+		axs[i].set_xlim([0, ref.SIMULATION_TIME])
 		axs[i].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 	axs[-1].set_xlabel("Timestamp [s]")
 	plt.tight_layout()

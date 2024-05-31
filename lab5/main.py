@@ -10,7 +10,7 @@ tunnel_prefix = "_tunnel" if ref.INCLUDE_TUNNEL else ""
 
 def main():
     # Apply random seed for repeatability
-    np.random.seed(42)
+    np.random.seed(22)
 
     # Reference (Position and velocities in N-E frame)
     ref_states = ref.generate_ref_states(ref.FREQ)
@@ -23,7 +23,7 @@ def main():
         time_gps = ref.generate_time_serie(freq=ref.GPS_FREQ)
         gps_states = ref.generate_ref_states(freq=ref.GPS_FREQ)[:, :2]
         gps_ref_states = gps_states.copy()
-        size = ref.GPS_FREQ * ref.SIMULATION_TIME
+        size = int(ref.GPS_FREQ * ref.SIMULATION_TIME)
         gps_states[:, 0] = gps_states[:, 0] + white_noise(size, sd=0.5)  # x
         gps_states[:, 1] = gps_states[:, 1] + white_noise(size, sd=0.5)  # y
 
@@ -83,11 +83,12 @@ def main():
         kf_states.append(kf.x_est)
         kf_covar_states.append(kf.p_est)
         
-        time_gps = list(time_gps)
+        time_gps = [round(x,5) for x in time_gps]
+        time = [round(x, 5) for x in time]
         for t in time[1:]:  # The initial position is not corrected, start at time[1]
             kf.predict()
             # Condition to add gps measure to kf
-            if t in time_gps and (t<ref.TUNNEL_TIME_START or t>= ref.TUNNEL_TIME_STOP or ref.INCLUDE_TUNNEL == False):
+            if round(t,5) in time_gps and (t<ref.TUNNEL_TIME_START or t>= ref.TUNNEL_TIME_STOP or ref.INCLUDE_TUNNEL == False):
                 ind = time_gps.index(t)
                 z = gps_states[ind]
                 kf.update(z)
@@ -130,9 +131,7 @@ def main():
         sigma_pos = stabilized_value
         p_var_vx = kf_covar_states[:, 2, 2]
         p_var_vy = kf_covar_states[:, 3, 3]
-        kf_predicted_velocity_quality = np.sqrt(p_var_vx + p_var_vy)
-        sigma_vel = np.mean(kf_predicted_velocity_quality[-10:])        
-        show_error(kf_states, ref_states, kf_covar_states, ref.FREQ, f"{real}{tunnel_prefix}", 'results/errors', True)
+        show_error(kf_states, ref_states, kf_covar_states, ref.FREQ, ref.GPS_FREQ, f"{real}{tunnel_prefix}", 'results/errors', True)
 
         # Innovation histogram
         innovation_sequence = gps_states - kf_states[::int(ref.FREQ/ref.GPS_FREQ), :2]
