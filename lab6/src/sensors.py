@@ -1,7 +1,7 @@
 import numpy as np
 
-import reference as ref
-import noise
+import src.reference as ref
+import src.noise as ns
 
 def sd_gm_to_sd_wn(sd_gm, beta, dt):
     sd_wn = np.sqrt(sd_gm ** 2 * (1 - np.exp(-2 * beta * dt)))
@@ -19,8 +19,8 @@ def generate_gps(ref_states, add_noise = True):
     gps[::OFFSET] = ref_states[::OFFSET, 3:].copy()
     n = gps[::OFFSET].shape[0]
     if add_noise:
-        gps[::OFFSET, 0] += noise.white_noise(n, SIGMA_GPS)
-        gps[::OFFSET, 1] += noise.white_noise(n, SIGMA_GPS)
+        gps[::OFFSET, 0] += ns.white_noise(n, SIGMA_GPS)
+        gps[::OFFSET, 1] += ns.white_noise(n, SIGMA_GPS)
     return gps
 
 """ IMU """
@@ -45,10 +45,10 @@ def generate_imu(ref_imu, add_noise = True):
 
     if add_noise:
         # Acc X,Y
-        imu[:, 0] += noise.white_noise(n, SIGMA_ACC_WN) + noise.gauss_markov(noise.white_noise(n, SIGMA_ACC_GM_WN), 1/TAU_ACC_GM, 1/IMU_FREQ)
-        imu[:, 1] += noise.white_noise(n, SIGMA_ACC_WN) + noise.gauss_markov(noise.white_noise(n, SIGMA_ACC_GM_WN), 1/TAU_ACC_GM, 1/IMU_FREQ)
+        imu[:, 0] += ns.white_noise(n, SIGMA_ACC_WN) + ns.gauss_markov(ns.white_noise(n, SIGMA_ACC_GM_WN), 1/TAU_ACC_GM, 1/IMU_FREQ)
+        imu[:, 1] += ns.white_noise(n, SIGMA_ACC_WN) + ns.gauss_markov(ns.white_noise(n, SIGMA_ACC_GM_WN), 1/TAU_ACC_GM, 1/IMU_FREQ)
 
         # Gyro
-        imu[:, 2] +=  BIAS_GYRO + noise.white_noise(n, SIGMA_GYRO_WN) + noise.gauss_markov(noise.white_noise(n, SIGMA_GYRO_GM_WN), 1/TAU_GYRO_GM, 1/IMU_FREQ)
+        imu[:, 2] +=  BIAS_GYRO + ns.white_noise(n, SIGMA_GYRO_WN) + ns.gauss_markov(ns.white_noise(n, SIGMA_GYRO_GM_WN), 1/TAU_GYRO_GM, 1/IMU_FREQ)
 
     return imu

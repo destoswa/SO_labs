@@ -1,11 +1,10 @@
 import scipy as sp
 import numpy as np
-from tqdm import tqdm 
 import matplotlib.pyplot as plt
 
-import reference as ref
-import sensors as sen
-import showing_results as sr
+import src.reference as ref
+import src.sensors as sen
+import src.showing_results as sr
 
 """ Simulation choice
 The IMU frequency is the frequency of the simulation
@@ -87,13 +86,13 @@ def main():
         F = np.zeros((dN,dN))   
         # F11
         F[1, 0] = -accs_m[1]
-        F[2, 0] = -accs_m[0]
+        F[2, 0] = accs_m[0]
         F[3, 1] = 1
         F[4, 2] = 1
         
         # F12
         F[0, 5:7] = 1
-        F[1:3, 7:] = R_bm.copy()
+        F[1:3, 7:] = R_bm
         
         # F22
         F[6, 6] = -1 / sen.TAU_GYRO_GM
@@ -118,8 +117,8 @@ def main():
             ])
 
         H = np.zeros((2,dN))                                    # CONSTANT 
-        H[0,4] = 1
-        H[1,5] = 1
+        H[0,3] = 1
+        H[1,4] = 1
 
         A = np.zeros((2 * dN, 2 * dN))
         A[:dN, :dN] = -F
@@ -139,7 +138,7 @@ def main():
             dZ = gps[t] - X[t, 3:5]
 
             # Gain K
-            R = np.diag([sen.SIGMA_GPS**2, sen.SIGMA_GPS**2])     # CONSTANT
+            R = np.diag([sen.SIGMA_GPS**2, sen.SIGMA_GPS**2])
             K = P[t] @ H.T  @ np.linalg.inv(H @ P[t] @ H.T + R)
 
             # State update
