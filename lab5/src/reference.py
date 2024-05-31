@@ -1,13 +1,13 @@
 import numpy as np
 
 # Simulation parameters
-NUMBER_REALIZATION = 5
+NUMBER_REALIZATION = 1
 SIMULATION_TIME = 200
 RADIUS = 25  # m
 OMEGA = np.pi / 100  # rad/s
-FREQ = 100  # freq IMU and simulation
+FREQ = 1 # freq IMU and simulation
 DT = 1/FREQ
-GPS_FREQ = 10
+GPS_FREQ = 0.5
 
 # Tunnel
 INCLUDE_TUNNEL = False

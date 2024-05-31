@@ -10,7 +10,7 @@ tunnel_prefix = "_tunnel" if ref.INCLUDE_TUNNEL else ""
 
 def main():
     # Apply random seed for repeatability
-    np.random.seed(22)
+    np.random.seed(12)
 
     # Reference (Position and velocities in N-E frame)
     ref_states = ref.generate_ref_states(ref.FREQ)
@@ -55,14 +55,13 @@ def main():
             [0, 1]
         ])
         sigma_a = 0.05 * np.sqrt(ref.FREQ)  # m/s² / sqrt(Hz)
-        w = np.eye(2, 2) * sigma_a
+        w = np.eye(2, 2) * sigma_a**2
         n = f.shape[0]
         A = np.zeros((2 * n, 2 * n))
         A[:n, :n] = -f
         A[:n, n:] = g @ w @ g.T
         A[n:, n:] = f.T
-        A = A * ref.DT
-        B = sp.linalg.expm(A)
+        B = sp.linalg.expm(A * ref.DT)
         phi = B[n:, n:].T
         q = phi @ B[:n, n:]
 
@@ -128,9 +127,6 @@ def main():
         
   
         # Position and Velocity errors alongside 3-sigma bounds
-        sigma_pos = stabilized_value
-        p_var_vx = kf_covar_states[:, 2, 2]
-        p_var_vy = kf_covar_states[:, 3, 3]
         show_error(kf_states, ref_states, kf_covar_states, ref.FREQ, ref.GPS_FREQ, f"{real}{tunnel_prefix}", 'results/errors', True)
 
         # Innovation histogram

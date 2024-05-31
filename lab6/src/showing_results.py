@@ -19,7 +19,7 @@ def fig_ref_traj(ref_states):
 
     plt.clf()
     plt.plot(ref_states[:, 4], ref_states[:, 3])
-    plt.savefig("lab6/results/reference_trajectory.jpg")
+    plt.savefig("results/reference_trajectory.svg")
 
 def fig_ref_imu(ref_imu):
     plt.clf()
@@ -29,12 +29,12 @@ def fig_ref_imu(ref_imu):
     
     axs[1].plot(ref_imu[:, 2], label="gyro")
     axs[1].legend()
-    plt.savefig("lab6/results/reference_imu.jpg")
+    plt.savefig("results/reference_imu.svg")
 
 def fig_gps(gps):
     plt.clf()
     plt.plot(gps[::200,1], gps[::200, 0])
-    plt.savefig("lab6/results/gps.jpg")
+    plt.savefig("results/gps.svg")
 
 def fig_imu(imu):
     plt.clf()
@@ -44,7 +44,7 @@ def fig_imu(imu):
     
     axs[1].plot(imu[:, 2], label="gyro")
     axs[1].legend()
-    plt.savefig("lab6/results/imu.jpg")
+    plt.savefig("results/imu.svg")
 
 def fig_traj(X, ref, gps):
     plt.clf()
@@ -52,7 +52,7 @@ def fig_traj(X, ref, gps):
     plt.plot(ref[:, 4], ref[:,3], label="Truth")
     plt.plot(gps[:,0], gps[:,1], label="GPS", marker="x")
     plt.legend()
-    plt.savefig("lab6/results/traj.jpg")
+    plt.savefig("results/traj.svg")
 
 
 

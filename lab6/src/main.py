@@ -14,15 +14,19 @@ We also assume the frequency are easily syncronisable
 --> all the timestamp of the gps are included in the timestamp of the imu
 """
 
+NOISY = True
+
 def main():
+    np.random.seed(42)
+
 
     """ Reference """ 
     ref_states = ref.generate_states()  # attitude, v_N, v_E, p_N, p_E, gyro_bias, gyro_noise, acc_x_noise, acc_y_noise
     ref_imu = ref.generate_imu()        # acc_x, acc_x, gyro
 
     """ Sensors """ 
-    gps = sen.generate_gps(ref_states)  # None when no measurement
-    imu = sen.generate_imu(ref_imu)
+    gps = sen.generate_gps(ref_states, add_noise=NOISY)  # None when no measurement
+    imu = sen.generate_imu(ref_imu, add_noise=NOISY)
 
     """ Initialize X, dX and P matrices, see 6.4, 6.5 """
     T, N = ref_states.shape
@@ -38,6 +42,9 @@ def main():
         gps[0,0],
         gps[0,1],
     ])
+
+    if not NOISY:
+        X[0] = ref_states[0]
 
     P[0] = np.diag([
         2*np.pi/180,
@@ -55,7 +62,6 @@ def main():
     """ Time loop / Simulation """
     for t, _ in enumerate(ref.TIME_SEQUENCE[1:], start=1):
         """ Strapdown from X[t-1] to X[t] using IMU[t-1] integration in NE frame """
-        
         # Attitude : a[t] = a[t-1] * w[t-1] * dt
         attitude_prev = X[t-1, 0]
         gyro = imu[t-1, 2]
@@ -63,8 +69,8 @@ def main():
 
         # IMU to NE frame
         R_bm = np.array([[np.cos(attitude_prev), -np.sin(attitude_prev)],
-                    [np.sin(attitude_prev), np.cos(attitude_prev)]]).T
-        accs_m = R_bm @ imu[t-1,:2].T
+                    [np.sin(attitude_prev), np.cos(attitude_prev)]])
+        accs_m = R_bm @ imu[t-1,:2]
         
         # Velocity : v[t] = v[t-1] + a[t-1] * dt
         v_prev = X[t-1, 1:3]
@@ -72,7 +78,7 @@ def main():
         
         # Position : p[t] = p[t-1] + v[t-1] * dt + 0.5 * a[t-1] * dt**2
         p_prev = X[t-1, 3:5]
-        p_next = p_prev + v_prev.T * ref.DT + 0.5 * accs_m * ref.DT**2
+        p_next = p_prev + v_next * ref.DT
 
         X[t, :] = np.array([attitude_next, v_next[0], v_next[1], p_next[0], p_next[1]])
 
@@ -125,20 +131,16 @@ def main():
         Q = phi @ B[:dN, dN:]
 
         # Predict dX
-        dX[t] = phi @ np.zeros((9)) #dX[t+1]   # Trivial == 0, No ???
+        dX[t] = phi @ dX[t-1]  
         P[t] = phi @ P[t-1] @ phi.T + Q
 
         # Update with dZ (GPS - State X)
-        if False:#not np.isnan(gps[t,0]):
-            print(dZ)
-            dZ = gps[t].copy() - X[t, 3:5].copy()
+        if not np.isnan(gps[t,0]):
+            dZ = gps[t] - X[t, 3:5]
 
             # Gain K
-            # TODO Avoid inversion with solving instead
             R = np.diag([sen.SIGMA_GPS**2, sen.SIGMA_GPS**2])     # CONSTANT
-            A = (H @ P[t] @ H.T + R).T
-            b = (P[t] @ H.T).T
-            K = np.linalg.solve(A, b).T
+            K = P[t] @ H.T  @ np.linalg.inv(H @ P[t] @ H.T + R)
 
             # State update
             dX[t] = dX[t] + K @ (dZ - H @ dX[t])
@@ -148,13 +150,14 @@ def main():
         
         """ Apply correction """
         X[t] += dX[t, :5]
-
+        dX[t, :5] = 0
 
     sr.fig_ref_traj(ref_states)
     sr.fig_ref_imu(ref_imu)
     sr.fig_gps(gps)
     sr.fig_imu(imu)
     sr.fig_traj(X, ref_states, gps)
+    
     
 
 if __name__ == "__main__":
