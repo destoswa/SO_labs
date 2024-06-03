@@ -3,7 +3,7 @@ import numpy as np
 import src.reference as ref
 import src.noise as ns
 
-TIME_CORRELATION_FACTOR = 1
+TIME_CORRELATION_FACTOR = 0.01
 
 
 def sd_gm_to_sd_wn(sd_gm, beta, dt):
