@@ -13,8 +13,6 @@ We also assume the frequency are easily syncronisable
 --> all the timestamp of the gps are included in the timestamp of the imu
 """
 
-NOISY = True
-
 def main():
     np.random.seed(42)
 
@@ -24,8 +22,8 @@ def main():
     ref_imu = ref.generate_imu()        # acc_x, acc_x, gyro
 
     """ Sensors """ 
-    gps = sen.generate_gps(ref_states, add_noise=NOISY)  # None when no measurement
-    imu = sen.generate_imu(ref_imu, add_noise=NOISY)
+    gps = sen.generate_gps(ref_states, add_noise=ref.NOISY)  # None when no measurement
+    imu = sen.generate_imu(ref_imu, add_noise=ref.NOISY)
 
     """ Initialize X, dX and P matrices, see 6.4, 6.5 """
     T, N = ref_states.shape
@@ -42,7 +40,7 @@ def main():
         gps[0,1],
     ])
 
-    if not NOISY:
+    if not ref.NOISY:
         X[0] = ref_states[0]
 
     P[0] = np.diag([
@@ -75,7 +73,7 @@ def main():
         v_prev = X[t-1, 1:3]
         v_next = v_prev + accs_m * ref.DT
         
-        # Position : p[t] = p[t-1] + v[t-1] * dt + 0.5 * a[t-1] * dt**2
+        # Position : p[t] = p[t-1] + v[t] * dt 
         p_prev = X[t-1, 3:5]
         p_next = p_prev + v_next * ref.DT
 
@@ -134,11 +132,11 @@ def main():
         P[t] = phi @ P[t-1] @ phi.T + Q
 
         # Update with dZ (GPS - State X)
-        if not np.isnan(gps[t,0]):
+        if not (np.isnan(gps[t,0]) or ref.is_in_tunnel(t))  :
             dZ = gps[t] - X[t, 3:5]
 
             # Gain K
-            R = np.diag([sen.SIGMA_GPS**2, sen.SIGMA_GPS**2])
+            R = np.diag([sen.SIGMA_GPS**2, sen.SIGMA_GPS**2])                       # CONSTANT
             K = P[t] @ H.T  @ np.linalg.inv(H @ P[t] @ H.T + R)
 
             # State update
@@ -157,7 +155,11 @@ def main():
     sr.fig_imu(imu)
     sr.fig_traj(X, ref_states, gps)
     
-    
+    # 2. Plot navigation errors with  3 sigmas bound
+    sr.show_error(X, ref_states, P, ref.SIMULATION_FREQ, sen.GPS_FREQ, "navigation", 'results/errors')
+
+    # 3. Plot IMU errors with 3 sigmas bound
+    sr.show_imu_error(dX, 0, P, ref.SIMULATION_FREQ, sen.GPS_FREQ, "imu", 'results/errors')
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,9 @@ import numpy as np
 import src.reference as ref
 import src.noise as ns
 
+TIME_CORRELATION_FACTOR = 1
+
+
 def sd_gm_to_sd_wn(sd_gm, beta, dt):
     sd_wn = np.sqrt(sd_gm ** 2 * (1 - np.exp(-2 * beta * dt)))
     return sd_wn
@@ -28,13 +31,13 @@ def generate_gps(ref_states, add_noise = True):
 IMU_FREQ = 100
 SIGMA_ACC_WN = 50E-6 * ref.GRAVITY_CST * np.sqrt(IMU_FREQ) 
 SIGMA_ACC_GM = 200E-6 * ref.GRAVITY_CST * np.sqrt(IMU_FREQ) 
-TAU_ACC_GM = 60
+TAU_ACC_GM = 60 * TIME_CORRELATION_FACTOR
 SIGMA_ACC_GM_WN = sd_gm_to_sd_wn(SIGMA_ACC_GM, 1/TAU_ACC_GM, 1/IMU_FREQ)
 
 BIAS_GYRO = -400 * np.pi/180 / 3600
 SIGMA_GYRO_WN = 0.1 * np.pi/180 * np.sqrt(IMU_FREQ / 3600) 
 SIGMA_GYRO_GM = 1E-2 * np.pi/180 * np.sqrt(IMU_FREQ) 
-TAU_GYRO_GM = 30
+TAU_GYRO_GM = 30 * TIME_CORRELATION_FACTOR
 SIGMA_GYRO_GM_WN = sd_gm_to_sd_wn(SIGMA_GYRO_GM, 1/TAU_GYRO_GM, 1/IMU_FREQ)
 
 

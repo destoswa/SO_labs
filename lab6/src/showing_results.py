@@ -9,7 +9,7 @@ Folders for plots
 TIME_UNIT = 's'
 LENGTH_UNIT = 'm'
 ANGLE_UNIT = 'rad'
-EXTENSIONS = ['jpg', 'svg']
+EXTENSIONS = [ 'svg']
 
 """
 Plots
@@ -94,23 +94,28 @@ def show_trajectory(kf_states, gps_states, prefix, src, do_save_fig=False):
     plt.rcParams.update({'font.size': 10})
 
 
-def show_error(kf_states, ref_states, sigma_pos, sigma_vel, freq,  prefix, src, do_save_fig=False):
+def show_error(kf_states, ref_states, kf_covar_states, freq, gps_freq,  prefix, src, do_save_fig=True):
     diff = kf_states - ref_states
+    
+    dt_diff = 1/freq
+    time_diff = np.arange(0, len(diff) * dt_diff, dt_diff)
+    time_gps = time_diff[::int(freq/gps_freq)]
+    simulation_time = time_diff[-1]
+
     plt.rcParams.update({'font.size':14})
-    fig, axs = plt.subplots(4, 1, figsize=(10, 10), sharex=True)
+    fig, axs = plt.subplots(5, 1, figsize=(10, 10), sharex=True)
     lw = 1.5
     ls = '--'
-    sigmas = [sigma_pos, sigma_pos, sigma_vel, sigma_vel]
-    y_labels = ['Pos N [m]', 'Pos E [m]', 'Vel N [m/s]', 'Vel E [m/s]', ]
+    y_labels = ['Attitude [rad]', 'Vel N [m/s]', 'Vel E [m/s]', 'Pos N [m]', 'Pos E [m]']
     fig.suptitle(f"Errors on positions and velocities at {freq}Hz")
-    for i in range(4):
-        axs[i].plot(range(len(diff[:, i])), diff[:, i])
-        axs[i].axline((0, -3 * sigmas[i]),(0.1, -3 * sigmas[i]), linewidth=lw, linestyle=ls, color='r')
-        axs[i].axline((0, 3 * sigmas[i]),(0.1, 3 * sigmas[i]), linewidth=lw, linestyle=ls, color='r')
+    for i in range(5):
+        axs[i].plot(time_diff, diff[:, i])
+        axs[i].plot(time_gps, 3 * np.sqrt(kf_covar_states[::int(freq/gps_freq), i, i]), linewidth=lw, linestyle=ls, color='r' )
+        axs[i].plot(time_gps, -3 * np.sqrt(kf_covar_states[::int(freq/gps_freq), i, i]), linewidth=lw, linestyle=ls, color='r' )
         axs[i].set_ylabel(y_labels[i])
-        ymax = max(max(diff[:, i]), 3*sigmas[i]) * 1.5
+        ymax = np.max(np.quantile(3*np.sqrt(kf_covar_states[:, i, i]), 0.9)) * 1.5
         axs[i].set_ylim([-ymax, ymax])
-        axs[i].set_xlim([0, len(diff[:, i])])
+        axs[i].set_xlim([0, simulation_time])
         axs[i].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
     axs[-1].set_xlabel("Timestamp [s]")
     plt.tight_layout()
@@ -119,7 +124,7 @@ def show_error(kf_states, ref_states, sigma_pos, sigma_vel, freq,  prefix, src, 
         save_fig(fig, src, str(freq) + "Hz_" + str(prefix), plot_name='errors')
 
 
-def show_innovation(seq, prefix, src, do_save_fig=False):
+def show_innovation(seq, prefix, src, do_save_fig= True):
     plt.rcParams.update({'font.size':14})
     fig,axs = plt.subplots(1,2, figsize=(12,6))
     axs[0].hist(seq[:,0])
@@ -136,3 +141,33 @@ def show_innovation(seq, prefix, src, do_save_fig=False):
         save_fig(fig, src, prefix, plot_name='innovation')
 
     plt.rcParams.update({'font.size':10})
+
+
+def show_imu_error(kf_states, ref_states, kf_covar_states, freq, gps_freq,  prefix, src, do_save_fig=True):
+    diff = kf_states - ref_states
+    
+    dt_diff = 1/freq
+    time_diff = np.arange(0, len(diff) * dt_diff, dt_diff)
+    time_gps = time_diff[::int(freq/gps_freq)]
+    simulation_time = time_diff[-1]
+
+    plt.rcParams.update({'font.size':14})
+    fig, axs = plt.subplots(4, 1, figsize=(10, 10), sharex=True)
+    lw = 1.5
+    ls = '--'
+    y_labels = ['Gyro bias [rad/s]', 'Gyro [rad/s]', 'Acc N [m/s²]', 'Acc E [m/s²]', ]
+    fig.suptitle(f"Errors on imu states at {freq}Hz")
+    for i, ax in enumerate(axs, start=5):
+        ax.plot(time_diff, diff[:, i])
+        ax.plot(time_gps, 3 * np.sqrt(kf_covar_states[::int(freq/gps_freq), i, i]), linewidth=lw, linestyle=ls, color='r' )
+        ax.plot(time_gps, -3 * np.sqrt(kf_covar_states[::int(freq/gps_freq), i, i]), linewidth=lw, linestyle=ls, color='r' )
+        ax.set_ylabel(y_labels[i-5])
+        ymax = np.max(np.quantile(3*np.sqrt(kf_covar_states[:, i, i]), 0.9)) * 1.5
+        ax.set_ylim([-ymax, ymax])
+        ax.set_xlim([0, simulation_time])
+        #ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    axs[-1].set_xlabel("Timestamp [s]")
+    plt.tight_layout()
+    plt.rcParams.update({'font.size':10})
+    if do_save_fig:
+        save_fig(fig, src, str(freq) + "Hz_" + str(prefix), plot_name='errors')
